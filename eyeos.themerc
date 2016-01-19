@@ -1,0 +1,5 @@
+[Misc]
+Name=eyeOS
+Comment=eyeOS widget style
+[KDE]
+WidgetStyle=eyeos
