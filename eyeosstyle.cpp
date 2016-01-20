@@ -28,6 +28,9 @@
 #include <QPushButton>
 #include <QStyleFactory>
 #include <QStyleOption>
+#include <QToolButton>
+
+#include <KActionMenu>
 
 using namespace EyeOs;
 
@@ -110,12 +113,14 @@ void EyeOs::Style::polish(QPalette &palette)
 void EyeOs::Style::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption *opt, QPainter *p, const QWidget *w) const
 {
     switch (pe) {
-    case PE_PanelButtonCommand:
-    case PE_PanelButtonBevel:
     case PE_PanelButtonTool:
     case PE_FrameButtonTool:
+        drawToolButtonBackground(opt, p, static_cast<const QToolButton*>(w));
+        break;
+    case PE_PanelButtonCommand:
+    case PE_PanelButtonBevel:
     case PE_FrameDefaultButton:
-        p->fillRect(opt->rect, buttonBackgroundColor(opt));
+        drawPushButtonBackground(opt, p);
         break;
     default:
         QProxyStyle::drawPrimitive(pe, opt, p, w);
@@ -150,19 +155,49 @@ int EyeOs::Style::pixelMetric(QStyle::PixelMetric metric, const QStyleOption *op
 int EyeOs::Style::styleHint(QStyle::StyleHint hint, const QStyleOption *opt, const QWidget *widget, QStyleHintReturn *returnData) const
 {
     switch (hint) {
+    case SH_ToolButtonStyle:
+        return Qt::ToolButtonIconOnly;
     default:
         return QProxyStyle::styleHint(hint, opt, widget, returnData);
     }
 }
 
-QColor Style::buttonBackgroundColor(const QStyleOption *opt) const
+void Style::drawPushButtonBackground(const QStyleOption *opt, QPainter *p) const
 {
     const bool enabled = opt->state & QStyle::State_Enabled;
     const bool mouseOver = opt->state & QStyle::State_MouseOver;
     const bool hasFocus = opt->state & QStyle::State_HasFocus;
 
-    return !enabled ? opt->palette.color(QPalette::Button)
-         : (mouseOver && !hasFocus) ? opt->palette.color(QPalette::Inactive, QPalette::Highlight)
-         : hasFocus ? opt->palette.color(QPalette::Active, QPalette::Highlight)
-         : opt->palette.color(QPalette::Button);
+    const QColor bgColor = !enabled ? opt->palette.color(QPalette::Button)
+                         : (mouseOver && !hasFocus) ? opt->palette.color(QPalette::Inactive, QPalette::Highlight)
+                         : hasFocus ? opt->palette.color(QPalette::Active, QPalette::Highlight)
+                         : opt->palette.color(QPalette::Button);
+
+    p->fillRect(opt->rect, bgColor);
+}
+
+void Style::drawToolButtonBackground(const QStyleOption *opt, QPainter *p, const QToolButton *button) const
+{
+    const bool mouseOver = opt->state & QStyle::State_MouseOver;
+    const bool checked= opt->state & QStyle::State_On;
+    const bool sunken = opt->state & QStyle::State_Sunken;
+    const bool hasMenu = button->menu() || qobject_cast<KActionMenu*>(button->defaultAction());
+
+    const QColor bgColor = mouseOver ? opt->palette.color(QPalette::Inactive, QPalette::Highlight)
+                         : opt->palette.color(QPalette::Window);
+
+    p->fillRect(opt->rect, bgColor);
+
+    if (checked || (hasMenu && sunken)) {
+        const QPen oldPen = p->pen();
+
+        const int penWidth = 4;
+        const QColor penColor = opt->palette.color(QPalette::Active, QPalette::Highlight);
+
+        p->setPen(QPen(penColor, penWidth));
+        p->drawLine(opt->rect.topLeft() + QPoint(0, penWidth / 2),
+                    opt->rect.topRight() + QPoint(0, penWidth / 2));
+
+        p->setPen(oldPen);
+    }
 }

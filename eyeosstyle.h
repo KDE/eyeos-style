@@ -26,6 +26,8 @@
 
 #include <QProxyStyle>
 
+class QToolButton;
+
 namespace EyeOs {
 
 class Style : public QProxyStyle
@@ -44,7 +46,8 @@ public:
     int styleHint(StyleHint hint, const QStyleOption *opt, const QWidget *widget, QStyleHintReturn *returnData) const;
 
 private:
-    QColor buttonBackgroundColor(const QStyleOption *opt) const;
+    void drawPushButtonBackground(const QStyleOption *opt, QPainter *p) const;
+    void drawToolButtonBackground(const QStyleOption *opt, QPainter *p, const QToolButton *button) const;
 };
 
 }
