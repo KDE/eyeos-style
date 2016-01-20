@@ -24,20 +24,27 @@
 #ifndef EYEOS_STYLE_H
 #define EYEOS_STYLE_H
 
-#include <KStyle>
+#include <QProxyStyle>
 
 namespace EyeOs {
 
-class Style : public KStyle
+class Style : public QProxyStyle
 {
     Q_OBJECT
 public:
     explicit Style();
 
+    using QProxyStyle::polish;
+    void polish(QApplication *app);
+    void polish(QPalette &palette);
+
     void drawPrimitive(PrimitiveElement pe, const QStyleOption *opt, QPainter *p, const QWidget *w) const;
     void drawControl(ControlElement control, const QStyleOption *opt, QPainter *p, const QWidget *w) const;
     int pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const;
     int styleHint(StyleHint hint, const QStyleOption *opt, const QWidget *widget, QStyleHintReturn *returnData) const;
+
+private:
+    QColor buttonBackgroundColor(const QStyleOption *opt) const;
 };
 
 }

@@ -17,6 +17,5 @@ kde4_add_plugin(eyeos ${eyeosstyle_SRCS})
 target_link_libraries(eyeos ${KDE4_KDEUI_LIBS})
 
 install(TARGETS eyeos DESTINATION ${PLUGIN_INSTALL_DIR}/plugins/styles/)
-install(FILES eyeos.colors DESTINATION ${DATA_INSTALL_DIR}/color-schemes/)
 install(FILES eyeos.themerc DESTINATION ${DATA_INSTALL_DIR}/kstyle/themes/)
 
