@@ -46,6 +46,12 @@ public:
     int styleHint(StyleHint hint, const QStyleOption *opt, const QWidget *widget, QStyleHintReturn *returnData) const;
 
 private:
+    int tabSpacing() const;
+    int frameWidth() const;
+    int activeLineWidth() const;
+
+    void drawFrame(const QStyleOption *opt, QPainter *p) const;
+    void drawTabBackground(const QStyleOption *opt, QPainter *p) const;
     void drawPushButtonBackground(const QStyleOption *opt, QPainter *p) const;
     void drawToolButtonBackground(const QStyleOption *opt, QPainter *p, const QToolButton *button) const;
 };
