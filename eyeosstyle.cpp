@@ -152,6 +152,8 @@ void EyeOs::Style::drawControl(QStyle::ControlElement control, const QStyleOptio
     case CE_TabBarTabLabel: {
         QStyleOptionTab tab = *qstyleoption_cast<const QStyleOptionTab*>(opt);
         tab.rect.adjust(-tabSpacing(), 0, 0, 0);
+        if (!tab.text.isEmpty())
+            tab.icon = QIcon();
         QProxyStyle::drawControl(control, &tab, p, w);
         break;
     }
