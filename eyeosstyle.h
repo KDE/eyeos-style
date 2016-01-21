@@ -27,6 +27,8 @@
 #include <QProxyStyle>
 
 class QToolButton;
+class QCheckBox;
+class QRadioButton;
 
 namespace EyeOs {
 
@@ -56,6 +58,8 @@ private:
     void drawPushButtonBackground(const QStyleOption *opt, QPainter *p) const;
     void drawToolButtonBackground(const QStyleOption *opt, QPainter *p, const QToolButton *button) const;
     void drawLineEditBackground(const QStyleOption *opt, QPainter *p, const QWidget *widget) const;
+    void drawCheckBox(const QStyleOption *opt, QPainter *p, const QCheckBox *checkBox) const;
+    void drawRadioButton(const QStyleOption *opt, QPainter *p, const QRadioButton *radioButton) const;
 };
 
 }

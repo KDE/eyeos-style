@@ -24,8 +24,10 @@
 #include "eyeosstyle.h"
 
 #include <QApplication>
+#include <QCheckBox>
 #include <QPainter>
 #include <QPushButton>
+#include <QRadioButton>
 #include <QStyleFactory>
 #include <QStyleOption>
 #include <QToolButton>
@@ -60,7 +62,7 @@ void EyeOs::Style::polish(QPalette &palette)
     palette.setColor(QPalette::Disabled, QPalette::ButtonText, QColor("#777777"));
     palette.setColor(QPalette::Disabled, QPalette::Base, QColor("#FFFFFF"));
     palette.setColor(QPalette::Disabled, QPalette::Window, QColor("#FFFFFF"));
-//    palette.setColor(QPalette::Disabled, QPalette::Shadow, QColor());
+    palette.setColor(QPalette::Disabled, QPalette::Shadow, QColor("#858FA9"));
     palette.setColor(QPalette::Disabled, QPalette::Highlight, QColor("#A5E6F6"));
     palette.setColor(QPalette::Disabled, QPalette::HighlightedText, QColor("#777777"));
 //    palette.setColor(QPalette::Disabled, QPalette::Link, QColor());
@@ -80,7 +82,7 @@ void EyeOs::Style::polish(QPalette &palette)
     palette.setColor(QPalette::Inactive, QPalette::ButtonText, QColor("#000000"));
     palette.setColor(QPalette::Inactive, QPalette::Base, QColor("#FFFFFF"));
     palette.setColor(QPalette::Inactive, QPalette::Window, QColor("#FFFFFF"));
-//    palette.setColor(QPalette::Inactive, QPalette::Shadow, QColor());
+    palette.setColor(QPalette::Inactive, QPalette::Shadow, QColor("#858FA9"));
     palette.setColor(QPalette::Inactive, QPalette::Highlight, QColor("#A5E6F6"));
     palette.setColor(QPalette::Inactive, QPalette::HighlightedText, QColor("#FFFFFF"));
 //    palette.setColor(QPalette::Inactive, QPalette::Link, QColor());
@@ -100,7 +102,7 @@ void EyeOs::Style::polish(QPalette &palette)
     palette.setColor(QPalette::Active, QPalette::ButtonText, QColor("#000000"));
     palette.setColor(QPalette::Active, QPalette::Base, QColor("#FFFFFF"));
     palette.setColor(QPalette::Active, QPalette::Window, QColor("#FFFFFF"));
-//    palette.setColor(QPalette::Active, QPalette::Shadow, QColor());
+    palette.setColor(QPalette::Active, QPalette::Shadow, QColor("#858FA9"));
     palette.setColor(QPalette::Active, QPalette::Highlight, QColor("#4BC8E7"));
     palette.setColor(QPalette::Active, QPalette::HighlightedText, QColor("#FFFFFF"));
 //    palette.setColor(QPalette::Active, QPalette::Link, QColor());
@@ -116,6 +118,14 @@ void EyeOs::Style::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption
     case PE_FrameTabWidget:
     case PE_FrameWindow:
         drawFrame(opt, p);
+        break;
+
+    case PE_IndicatorCheckBox:
+        drawCheckBox(opt, p, static_cast<const QCheckBox*>(w));
+        break;
+
+    case PE_IndicatorRadioButton:
+        drawRadioButton(opt, p, static_cast<const QRadioButton*>(w));
         break;
 
     case PE_PanelLineEdit:
@@ -171,6 +181,13 @@ void EyeOs::Style::drawControl(QStyle::ControlElement control, const QStyleOptio
 int EyeOs::Style::pixelMetric(QStyle::PixelMetric metric, const QStyleOption *option, const QWidget *widget) const
 {
     switch (metric) {
+    case PM_ExclusiveIndicatorWidth:
+    case PM_ExclusiveIndicatorHeight:
+        return 18;
+    case PM_IndicatorWidth:
+    case PM_IndicatorHeight:
+        return 19;
+
     case PM_DefaultFrameWidth:
         return frameWidth();
     case PM_TabBarBaseOverlap:
@@ -370,4 +387,64 @@ void Style::drawLineEditBackground(const QStyleOption *opt, QPainter *p, const Q
 
     p->setPen(oldPen);
     p->setBrush(oldBrush);
+}
+
+void Style::drawCheckBox(const QStyleOption *opt, QPainter *p, const QCheckBox *checkBox) const
+{
+    const QPen oldPen = p->pen();
+    const QBrush oldBrush = p->brush();
+
+    const QColor penColor = opt->palette.color(QPalette::Shadow);
+    const int outlineWidth = frameWidth();
+
+    p->setPen(QPen(penColor, outlineWidth));
+    p->drawRect(opt->rect.adjusted(outlineWidth / 2,
+                                   outlineWidth / 2,
+                                   -outlineWidth / 2 - 1,
+                                   -outlineWidth / 2 - 1));
+
+    if (checkBox->isChecked()) {
+        const QRect markRect = opt->rect.adjusted(4, 4, -4, -4);
+
+        p->setPen(Qt::NoPen);
+        p->setBrush(opt->palette.color(QPalette::Highlight));
+
+        if (checkBox->checkState() == Qt::Checked) {
+            p->drawRect(markRect);
+        } else {
+            p->drawPolygon(QVector<QPoint>() << markRect.bottomLeft()
+                                             << markRect.topLeft()
+                                             << markRect.topRight());
+        }
+    }
+
+    p->setPen(oldPen);
+    p->setBrush(oldBrush);
+}
+
+void Style::drawRadioButton(const QStyleOption *opt, QPainter *p, const QRadioButton *radioButton) const
+{
+    const QPen oldPen = p->pen();
+    const QBrush oldBrush = p->brush();
+    const bool antiAliasing = p->renderHints() & QPainter::Antialiasing;
+
+    const QColor penColor = opt->palette.color(QPalette::Shadow);
+    const int outlineWidth = frameWidth();
+
+    p->setRenderHint(QPainter::Antialiasing, true);
+    p->setPen(QPen(penColor, outlineWidth));
+    p->drawEllipse(opt->rect.adjusted(outlineWidth / 2,
+                                      outlineWidth / 2,
+                                      -outlineWidth / 2 - 1,
+                                      -outlineWidth / 2 - 1));
+
+    if (radioButton->isChecked()) {
+        p->setPen(Qt::NoPen);
+        p->setBrush(opt->palette.color(QPalette::Highlight));
+        p->drawEllipse(opt->rect.adjusted(4, 4, -5, -5));
+    }
+
+    p->setPen(oldPen);
+    p->setBrush(oldBrush);
+    p->setRenderHint(QPainter::Antialiasing, antiAliasing);
 }
