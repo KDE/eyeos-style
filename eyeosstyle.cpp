@@ -51,7 +51,7 @@ void EyeOs::Style::polish(QPalette &palette)
 {
     palette.setColor(QPalette::Disabled, QPalette::WindowText, QColor("#777777"));
     palette.setColor(QPalette::Disabled, QPalette::Button, QColor("#E7E9EE"));
-//    palette.setColor(QPalette::Disabled, QPalette::Light, QColor());
+    palette.setColor(QPalette::Disabled, QPalette::Light, QColor("#E7E9EE"));
 //    palette.setColor(QPalette::Disabled, QPalette::Midlight, QColor());
 //    palette.setColor(QPalette::Disabled, QPalette::Dark, QColor());
     palette.setColor(QPalette::Disabled, QPalette::Mid, QColor("#C8CDD8"));
@@ -71,7 +71,7 @@ void EyeOs::Style::polish(QPalette &palette)
 
     palette.setColor(QPalette::Inactive, QPalette::WindowText, QColor("#000000"));
     palette.setColor(QPalette::Inactive, QPalette::Button, QColor("#E7E9EE"));
-//    palette.setColor(QPalette::Inactive, QPalette::Light, QColor());
+    palette.setColor(QPalette::Inactive, QPalette::Light, QColor("#E7E9EE"));
 //    palette.setColor(QPalette::Inactive, QPalette::Midlight, QColor());
 //    palette.setColor(QPalette::Inactive, QPalette::Dark, QColor());
     palette.setColor(QPalette::Inactive, QPalette::Mid, QColor("#C8CDD8"));
@@ -91,7 +91,7 @@ void EyeOs::Style::polish(QPalette &palette)
 
     palette.setColor(QPalette::Active, QPalette::WindowText, QColor("#000000"));
     palette.setColor(QPalette::Active, QPalette::Button, QColor("#E7E9EE"));
-//    palette.setColor(QPalette::Active, QPalette::Light, QColor());
+    palette.setColor(QPalette::Active, QPalette::Light, QColor("#E7E9EE"));
 //    palette.setColor(QPalette::Active, QPalette::Midlight, QColor());
 //    palette.setColor(QPalette::Active, QPalette::Dark, QColor());
     palette.setColor(QPalette::Active, QPalette::Mid, QColor("#C8CDD8"));
@@ -116,6 +116,10 @@ void EyeOs::Style::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption
     case PE_FrameTabWidget:
     case PE_FrameWindow:
         drawFrame(opt, p);
+        break;
+
+    case PE_PanelLineEdit:
+        drawLineEditBackground(opt, p, w);
         break;
 
     case PE_PanelButtonTool:
@@ -190,6 +194,34 @@ int EyeOs::Style::styleHint(QStyle::StyleHint hint, const QStyleOption *opt, con
     default:
         return QProxyStyle::styleHint(hint, opt, widget, returnData);
     }
+}
+
+QSize EyeOs::Style::sizeFromContents(QStyle::ContentsType type, const QStyleOption *opt, const QSize &contentsSize, const QWidget *w) const
+{
+    QSize result = QProxyStyle::sizeFromContents(type, opt, contentsSize, w);
+
+    switch (type) {
+    case CT_PushButton:
+    case CT_CheckBox:
+    case CT_RadioButton:
+    case CT_ComboBox:
+    case CT_ProgressBar:
+    case CT_MenuItem:
+    case CT_MenuBarItem:
+    case CT_MenuBar:
+    case CT_Slider:
+    case CT_LineEdit:
+    case CT_SpinBox:
+    case CT_DialogButtons:
+    case CT_HeaderSection:
+        result.setHeight(qMax(30, result.height()));
+        break;
+
+    default:
+        break;
+    }
+
+    return result;
 }
 
 int Style::tabSpacing() const
@@ -309,4 +341,33 @@ void Style::drawToolButtonBackground(const QStyleOption *opt, QPainter *p, const
 
         p->setPen(oldPen);
     }
+}
+
+void Style::drawLineEditBackground(const QStyleOption *opt, QPainter *p, const QWidget *widget) const
+{
+    const bool hasFrame = widget->property("frame").toBool();
+
+    const QColor bgColor = opt->palette.color(QPalette::Base);
+    const QColor penColor = hasFrame ? opt->palette.color(QPalette::Light)
+                                     : bgColor;
+    const int outlineWidth = frameWidth();
+
+    const QPen oldPen = p->pen();
+    const QBrush oldBrush = p->brush();
+
+    p->setPen(QPen(penColor, outlineWidth));
+    p->setBrush(bgColor);
+    p->drawRect(opt->rect.adjusted(outlineWidth / 2,
+                                   outlineWidth / 2,
+                                   -outlineWidth / 2 - 1,
+                                   -outlineWidth / 2 - 1));
+
+    if (!hasFrame) {
+        p->setPen(QPen(opt->palette.color(QPalette::Mid), outlineWidth));
+        p->drawLine(opt->rect.bottomLeft() - QPoint(0, outlineWidth / 2 + 1),
+                    opt->rect.bottomRight() - QPoint(0, outlineWidth / 2 + 1));
+    }
+
+    p->setPen(oldPen);
+    p->setBrush(oldBrush);
 }

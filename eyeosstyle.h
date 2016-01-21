@@ -44,6 +44,7 @@ public:
     void drawControl(ControlElement control, const QStyleOption *opt, QPainter *p, const QWidget *w) const;
     int pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const;
     int styleHint(StyleHint hint, const QStyleOption *opt, const QWidget *widget, QStyleHintReturn *returnData) const;
+    QSize sizeFromContents(ContentsType type, const QStyleOption *opt, const QSize &contentsSize, const QWidget *w) const;
 
 private:
     int tabSpacing() const;
@@ -54,6 +55,7 @@ private:
     void drawTabBackground(const QStyleOption *opt, QPainter *p) const;
     void drawPushButtonBackground(const QStyleOption *opt, QPainter *p) const;
     void drawToolButtonBackground(const QStyleOption *opt, QPainter *p, const QToolButton *button) const;
+    void drawLineEditBackground(const QStyleOption *opt, QPainter *p, const QWidget *widget) const;
 };
 
 }
