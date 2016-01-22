@@ -37,6 +37,35 @@
 
 using namespace EyeOs;
 
+class PainterStateSaver
+{
+public:
+    PainterStateSaver(QPainter *painter)
+        : m_painter(painter)
+    {
+        m_pen = m_painter->pen();
+        m_brush = m_painter->brush();
+        m_antialiasing = m_painter->renderHints() & QPainter::Antialiasing;
+    }
+
+    ~PainterStateSaver()
+    {
+        m_painter->setPen(m_pen);
+        m_painter->setBrush(m_brush);
+        m_painter->setRenderHint(QPainter::Antialiasing, m_antialiasing);
+    }
+
+private:
+    QPainter *m_painter;
+    QPen m_pen;
+    QBrush m_brush;
+    bool m_antialiasing;
+};
+
+#define SAVE_PAINTER(p) \
+    PainterStateSaver _painter_state_saver(p); \
+    Q_UNUSED(_painter_state_saver);
+
 Style::Style()
     : QProxyStyle(QStyleFactory::create("plastique"))
 {
@@ -279,8 +308,7 @@ int Style::activeLineWidth() const
 
 void Style::drawFrame(const QStyleOption *opt, QPainter *p, QPalette::ColorRole colorRole) const
 {
-    const QPen oldPen = p->pen();
-    const QBrush oldBrush = p->brush();
+    SAVE_PAINTER(p);
 
     const int penWidth = pixelMetric(PM_DefaultFrameWidth, 0, 0);
     const QColor penColor = opt->palette.color(colorRole);
@@ -292,15 +320,11 @@ void Style::drawFrame(const QStyleOption *opt, QPainter *p, QPalette::ColorRole 
                                    penWidth / 2,
                                    -penWidth / 2 - 1,
                                    -penWidth / 2 - 1));
-
-    p->setPen(oldPen);
-    p->setBrush(oldBrush);
 }
 
 void Style::drawTabBackground(const QStyleOption *opt, QPainter *p) const
 {
-    const QPen oldPen = p->pen();
-    const QBrush oldBrush = p->brush();
+    SAVE_PAINTER(p);
 
     const bool isSelected = (opt->state & QStyle::State_Selected);
     const bool mouseOver = opt->state & QStyle::State_MouseOver;
@@ -336,9 +360,6 @@ void Style::drawTabBackground(const QStyleOption *opt, QPainter *p) const
         p->drawLine(opt->rect.topLeft() + QPoint(topOffsetX, topOffsetY),
                     opt->rect.topRight() + QPoint(-spacing - topOffsetX + 1, topOffsetY));
     }
-
-    p->setPen(oldPen);
-    p->setBrush(oldBrush);
 }
 
 void Style::drawPushButtonBackground(const QStyleOption *opt, QPainter *p) const
@@ -373,7 +394,7 @@ void Style::drawToolButtonBackground(const QStyleOption *opt, QPainter *p, const
     p->fillRect(opt->rect, bgColor);
 
     if (checked || (hasMenu && sunken)) {
-        const QPen oldPen = p->pen();
+        SAVE_PAINTER(p);
 
         const int penWidth = activeLineWidth();
         const QColor penColor = opt->palette.color(QPalette::Active, QPalette::Highlight);
@@ -381,8 +402,6 @@ void Style::drawToolButtonBackground(const QStyleOption *opt, QPainter *p, const
         p->setPen(QPen(penColor, penWidth));
         p->drawLine(opt->rect.topLeft() + QPoint(0, penWidth / 2),
                     opt->rect.topRight() + QPoint(0, penWidth / 2));
-
-        p->setPen(oldPen);
     }
 }
 
@@ -402,8 +421,7 @@ void Style::drawLineEditBackground(const QStyleOption *opt, QPainter *p, const Q
                                      : bgColor;
     const int outlineWidth = frameWidth();
 
-    const QPen oldPen = p->pen();
-    const QBrush oldBrush = p->brush();
+    SAVE_PAINTER(p);
 
     p->setPen(QPen(penColor, outlineWidth));
     p->setBrush(bgColor);
@@ -417,15 +435,11 @@ void Style::drawLineEditBackground(const QStyleOption *opt, QPainter *p, const Q
         p->drawLine(opt->rect.bottomLeft() - QPoint(0, outlineWidth / 2 + 1),
                     opt->rect.bottomRight() - QPoint(0, outlineWidth / 2 + 1));
     }
-
-    p->setPen(oldPen);
-    p->setBrush(oldBrush);
 }
 
 void Style::drawCheckBox(const QStyleOption *opt, QPainter *p, const QCheckBox *checkBox) const
 {
-    const QPen oldPen = p->pen();
-    const QBrush oldBrush = p->brush();
+    SAVE_PAINTER(p);
 
     const QColor penColor = opt->palette.color(QPalette::Shadow);
     const int outlineWidth = frameWidth();
@@ -450,16 +464,11 @@ void Style::drawCheckBox(const QStyleOption *opt, QPainter *p, const QCheckBox *
                                              << markRect.topRight());
         }
     }
-
-    p->setPen(oldPen);
-    p->setBrush(oldBrush);
 }
 
 void Style::drawRadioButton(const QStyleOption *opt, QPainter *p, const QRadioButton *radioButton) const
 {
-    const QPen oldPen = p->pen();
-    const QBrush oldBrush = p->brush();
-    const bool antiAliasing = p->renderHints() & QPainter::Antialiasing;
+    SAVE_PAINTER(p);
 
     const QColor penColor = opt->palette.color(QPalette::Shadow);
     const int outlineWidth = frameWidth();
@@ -476,10 +485,6 @@ void Style::drawRadioButton(const QStyleOption *opt, QPainter *p, const QRadioBu
         p->setBrush(opt->palette.color(QPalette::Highlight));
         p->drawEllipse(opt->rect.adjusted(4, 4, -5, -5));
     }
-
-    p->setPen(oldPen);
-    p->setBrush(oldBrush);
-    p->setRenderHint(QPainter::Antialiasing, antiAliasing);
 }
 
 void Style::drawComboBox(const QStyleOptionComboBox *opt, QPainter *p, const QComboBox *combo) const
@@ -498,8 +503,7 @@ void Style::drawComboBox(const QStyleOptionComboBox *opt, QPainter *p, const QCo
         const int yoffset = sunken ? 1 : 0;
         const QRect rect = opt->rect;
 
-        const QPen oldPen = p->pen();
-        const bool antiAliasing = p->renderHints() & QPainter::Antialiasing;
+        SAVE_PAINTER(p);
 
         int left = !reverse ? rect.right() - menuButtonWidth : rect.left();
         int right = !reverse ? rect.right() : rect.left() + menuButtonWidth;
@@ -511,10 +515,7 @@ void Style::drawComboBox(const QStyleOptionComboBox *opt, QPainter *p, const QCo
               << arrowRect.center() + QPoint(0, 2)
               << arrowRect.center() + QPoint(4, -2);
         p->setRenderHint(QPainter::Antialiasing, true);
-        p->setPen(QPen(oldPen.brush(), 1.1));
+        p->setPen(QPen(p->pen().brush(), 1.1));
         p->drawPolyline(arrow);
-
-        p->setPen(oldPen);
-        p->setRenderHint(QPainter::Antialiasing, antiAliasing);
     }
 }
