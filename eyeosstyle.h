@@ -28,7 +28,9 @@
 
 class QToolButton;
 class QCheckBox;
+class QComboBox;
 class QRadioButton;
+class QStyleOptionComboBox;
 
 namespace EyeOs {
 
@@ -44,6 +46,7 @@ public:
 
     void drawPrimitive(PrimitiveElement pe, const QStyleOption *opt, QPainter *p, const QWidget *w) const;
     void drawControl(ControlElement control, const QStyleOption *opt, QPainter *p, const QWidget *w) const;
+    void drawComplexControl(ComplexControl control, const QStyleOptionComplex *opt, QPainter *p, const QWidget *w) const;
     int pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const;
     int styleHint(StyleHint hint, const QStyleOption *opt, const QWidget *widget, QStyleHintReturn *returnData) const;
     QSize sizeFromContents(ContentsType type, const QStyleOption *opt, const QSize &contentsSize, const QWidget *w) const;
@@ -53,13 +56,14 @@ private:
     int frameWidth() const;
     int activeLineWidth() const;
 
-    void drawFrame(const QStyleOption *opt, QPainter *p) const;
+    void drawFrame(const QStyleOption *opt, QPainter *p, QPalette::ColorRole colorRole = QPalette::Mid) const;
     void drawTabBackground(const QStyleOption *opt, QPainter *p) const;
     void drawPushButtonBackground(const QStyleOption *opt, QPainter *p) const;
-    void drawToolButtonBackground(const QStyleOption *opt, QPainter *p, const QToolButton *button) const;
+    void drawToolButtonBackground(const QStyleOption *opt, QPainter *p, const QWidget *w) const;
     void drawLineEditBackground(const QStyleOption *opt, QPainter *p, const QWidget *widget) const;
     void drawCheckBox(const QStyleOption *opt, QPainter *p, const QCheckBox *checkBox) const;
     void drawRadioButton(const QStyleOption *opt, QPainter *p, const QRadioButton *radioButton) const;
+    void drawComboBox(const QStyleOptionComboBox *opt, QPainter *p, const QComboBox *combo) const;
 };
 
 }

@@ -25,6 +25,7 @@
 
 #include <QApplication>
 #include <QCheckBox>
+#include <QComboBox>
 #include <QPainter>
 #include <QPushButton>
 #include <QRadioButton>
@@ -120,6 +121,14 @@ void EyeOs::Style::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption
         drawFrame(opt, p);
         break;
 
+    case PE_Frame:
+        if (qobject_cast<QComboBox*>(w->parentWidget())) {
+            drawFrame(opt, p, QPalette::Light);
+        } else {
+            QProxyStyle::drawPrimitive(pe, opt, p, w);
+        }
+        break;
+
     case PE_IndicatorCheckBox:
         drawCheckBox(opt, p, static_cast<const QCheckBox*>(w));
         break;
@@ -175,6 +184,18 @@ void EyeOs::Style::drawControl(QStyle::ControlElement control, const QStyleOptio
     default:
         QProxyStyle::drawControl(control, opt, p, w);
         break;
+    }
+}
+
+void EyeOs::Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex *opt, QPainter *p, const QWidget *w) const
+{
+    switch (control) {
+    case CC_ComboBox:
+        drawComboBox(qstyleoption_cast<const QStyleOptionComboBox*>(opt), p, static_cast<const QComboBox*>(w));
+        break;
+
+    default:
+        QProxyStyle::drawComplexControl(control, opt, p, w);
     }
 }
 
@@ -256,13 +277,13 @@ int Style::activeLineWidth() const
     return 4;
 }
 
-void Style::drawFrame(const QStyleOption *opt, QPainter *p) const
+void Style::drawFrame(const QStyleOption *opt, QPainter *p, QPalette::ColorRole colorRole) const
 {
     const QPen oldPen = p->pen();
     const QBrush oldBrush = p->brush();
 
     const int penWidth = pixelMetric(PM_DefaultFrameWidth, 0, 0);
-    const QColor penColor = opt->palette.color(QPalette::Mid);
+    const QColor penColor = opt->palette.color(colorRole);
     const QColor bgColor = opt->palette.color(QPalette::Window);
 
     p->setPen(QPen(penColor, penWidth));
@@ -334,12 +355,17 @@ void Style::drawPushButtonBackground(const QStyleOption *opt, QPainter *p) const
     p->fillRect(opt->rect, bgColor);
 }
 
-void Style::drawToolButtonBackground(const QStyleOption *opt, QPainter *p, const QToolButton *button) const
+void Style::drawToolButtonBackground(const QStyleOption *opt, QPainter *p, const QWidget *w) const
 {
     const bool mouseOver = opt->state & QStyle::State_MouseOver;
-    const bool checked= opt->state & QStyle::State_On;
+    const bool checked = opt->state & QStyle::State_On;
     const bool sunken = opt->state & QStyle::State_Sunken;
-    const bool hasMenu = button->menu() || qobject_cast<KActionMenu*>(button->defaultAction());
+
+    const QComboBox *combo = qobject_cast<const QComboBox*>(w);
+    const QToolButton *button = qobject_cast<const QToolButton*>(w);
+    const bool hasMenu = combo
+                      || (button && button->menu())
+                      || (button && qobject_cast<KActionMenu*>(button->defaultAction()));
 
     const QColor bgColor = mouseOver ? opt->palette.color(QPalette::Inactive, QPalette::Highlight)
                          : opt->palette.color(QPalette::Window);
@@ -362,7 +388,14 @@ void Style::drawToolButtonBackground(const QStyleOption *opt, QPainter *p, const
 
 void Style::drawLineEditBackground(const QStyleOption *opt, QPainter *p, const QWidget *widget) const
 {
-    const bool hasFrame = widget->property("frame").toBool();
+    // The combo will control its own look, no need for any frame here
+    if (qobject_cast<QComboBox*>(widget->parentWidget())) {
+        return;
+    }
+
+    const QComboBox *combo = qobject_cast<const QComboBox*>(widget);
+    const bool hasFrame = widget->property("frame").toBool()
+                       || (combo && (opt->state & QStyle::State_On));
 
     const QColor bgColor = opt->palette.color(QPalette::Base);
     const QColor penColor = hasFrame ? opt->palette.color(QPalette::Light)
@@ -447,4 +480,41 @@ void Style::drawRadioButton(const QStyleOption *opt, QPainter *p, const QRadioBu
     p->setPen(oldPen);
     p->setBrush(oldBrush);
     p->setRenderHint(QPainter::Antialiasing, antiAliasing);
+}
+
+void Style::drawComboBox(const QStyleOptionComboBox *opt, QPainter *p, const QComboBox *combo) const
+{
+    if (combo->isEditable() || (opt->state & QStyle::State_On)) {
+        drawLineEditBackground(opt, p, combo);
+    } else {
+        drawToolButtonBackground(opt, p, combo);
+    }
+
+    if (opt->subControls & SC_ComboBoxArrow) {
+        const bool sunken = opt->state & State_On;
+        const bool reverse = opt->direction == Qt::RightToLeft;
+        const int menuButtonWidth = 16;
+        const int xoffset = sunken ? (reverse ? -1 : 1) : 0;
+        const int yoffset = sunken ? 1 : 0;
+        const QRect rect = opt->rect;
+
+        const QPen oldPen = p->pen();
+        const bool antiAliasing = p->renderHints() & QPainter::Antialiasing;
+
+        int left = !reverse ? rect.right() - menuButtonWidth : rect.left();
+        int right = !reverse ? rect.right() : rect.left() + menuButtonWidth;
+        QRect arrowRect((left + right) / 2 - 3 + xoffset,
+                        rect.center().y() - 1 + yoffset, 7, 4);
+
+        QPolygon arrow;
+        arrow << arrowRect.center() + QPoint(-4, -2)
+              << arrowRect.center() + QPoint(0, 2)
+              << arrowRect.center() + QPoint(4, -2);
+        p->setRenderHint(QPainter::Antialiasing, true);
+        p->setPen(QPen(oldPen.brush(), 1.1));
+        p->drawPolyline(arrow);
+
+        p->setPen(oldPen);
+        p->setRenderHint(QPainter::Antialiasing, antiAliasing);
+    }
 }
