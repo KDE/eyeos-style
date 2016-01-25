@@ -26,12 +26,17 @@
 #include <QApplication>
 #include <QCheckBox>
 #include <QComboBox>
+#include <QDateEdit>
+#include <QDateTimeEdit>
+#include <QDoubleSpinBox>
 #include <QPainter>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QScrollBar>
+#include <QSpinBox>
 #include <QStyleFactory>
 #include <QStyleOption>
+#include <QTimeEdit>
 #include <QToolButton>
 
 #include <KActionMenu>
@@ -174,6 +179,13 @@ void EyeOs::Style::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption
         drawRadioButton(opt, p, static_cast<const QRadioButton*>(w));
         break;
 
+    case PE_IndicatorSpinUp:
+        drawArrow(opt->rect, p, Qt::UpArrow);
+        break;
+    case PE_IndicatorSpinDown:
+        drawArrow(opt->rect, p, Qt::DownArrow);
+        break;
+
     case PE_PanelLineEdit:
         drawLineEditBackground(opt, p, w);
         break;
@@ -186,7 +198,13 @@ void EyeOs::Style::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption
     case PE_PanelButtonCommand:
     case PE_PanelButtonBevel:
     case PE_FrameDefaultButton:
-        drawPushButtonBackground(opt, p);
+        if (!qobject_cast<const QDoubleSpinBox*>(w)
+         && !qobject_cast<const QDateTimeEdit*>(w)
+         && !qobject_cast<const QDateEdit*>(w)
+         && !qobject_cast<const QSpinBox*>(w)
+         && !qobject_cast<const QTimeEdit*>(w)) {
+            drawPushButtonBackground(opt, p);
+        }
         break;
 
     default:
@@ -252,6 +270,13 @@ void EyeOs::Style::drawComplexControl(ComplexControl control, const QStyleOption
     case CC_ComboBox:
         drawComboBox(qstyleoption_cast<const QStyleOptionComboBox*>(opt), p, static_cast<const QComboBox*>(w));
         break;
+    case CC_SpinBox: {
+        QStyleOptionSpinBox option = *qstyleoption_cast<const QStyleOptionSpinBox*>(opt);
+        option.subControls &= ~SC_SpinBoxFrame;
+        drawLineEditBackground(opt, p, w);
+        QCommonStyle::drawComplexControl(control, &option, p, w);
+        break;
+    }
 
     default:
         QProxyStyle::drawComplexControl(control, opt, p, w);
@@ -438,7 +463,12 @@ void Style::drawToolButtonBackground(const QStyleOption *opt, QPainter *p, const
 void Style::drawLineEditBackground(const QStyleOption *opt, QPainter *p, const QWidget *widget) const
 {
     // The combo will control its own look, no need for any frame here
-    if (qobject_cast<QComboBox*>(widget->parentWidget())) {
+    if (qobject_cast<QComboBox*>(widget->parentWidget())
+     || qobject_cast<QDoubleSpinBox*>(widget->parentWidget())
+     || qobject_cast<QDateTimeEdit*>(widget->parentWidget())
+     || qobject_cast<QDateEdit*>(widget->parentWidget())
+     || qobject_cast<QSpinBox*>(widget->parentWidget())
+     || qobject_cast<QTimeEdit*>(widget->parentWidget())) {
         return;
     }
 

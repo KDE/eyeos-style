@@ -32,6 +32,7 @@ class QCheckBox;
 class QComboBox;
 class QRadioButton;
 class QStyleOptionComboBox;
+class QStyleOptionSpinBox;
 
 namespace EyeOs {
 
