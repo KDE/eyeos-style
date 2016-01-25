@@ -29,6 +29,7 @@
 #include <QPainter>
 #include <QPushButton>
 #include <QRadioButton>
+#include <QScrollBar>
 #include <QStyleFactory>
 #include <QStyleOption>
 #include <QToolButton>
@@ -77,6 +78,13 @@ void Style::polish(QApplication *app)
     QFont font("Sans");
     font.setPixelSize(16);
     app->setFont(font);
+}
+
+void Style::polish(QWidget *widget)
+{
+    if (qobject_cast<QScrollBar*>(widget)) {
+        widget->setAttribute(Qt::WA_Hover);
+    }
 }
 
 void EyeOs::Style::polish(QPalette &palette)
@@ -209,6 +217,28 @@ void EyeOs::Style::drawControl(QStyle::ControlElement control, const QStyleOptio
         QProxyStyle::drawControl(control, &tab, p, w);
         break;
     }
+
+    case CE_ScrollBarAddPage:
+    case CE_ScrollBarSubPage:
+        p->fillRect(opt->rect, opt->palette.color(QPalette::Window));
+        break;
+
+    case CE_ScrollBarSlider:
+        if (const QScrollBar *scrollBar = qobject_cast<const QScrollBar*>(w)) {
+            drawScrollBarHandle(opt, p, scrollBar->orientation());
+        }
+        break;
+
+    case CE_ScrollBarAddLine:
+        if (const QScrollBar *scrollBar = qobject_cast<const QScrollBar*>(w)) {
+            drawAddButton(opt, p, scrollBar->orientation());
+        }
+        break;
+    case CE_ScrollBarSubLine:
+        if (const QScrollBar *scrollBar = qobject_cast<const QScrollBar*>(w)) {
+            drawSubButton(opt, p, scrollBar->orientation());
+        }
+        break;
 
     default:
         QProxyStyle::drawControl(control, opt, p, w);
@@ -487,6 +517,41 @@ void Style::drawRadioButton(const QStyleOption *opt, QPainter *p, const QRadioBu
     }
 }
 
+void Style::drawArrow(QRect rect, QPainter *p, Qt::ArrowType arrow) const
+{
+    QPolygon shape;
+    switch (arrow) {
+    case Qt::NoArrow:
+        break;
+    case Qt::UpArrow:
+        shape << rect.center() + QPoint(-4, 2)
+              << rect.center() + QPoint(0, -2)
+              << rect.center() + QPoint(4, 2);
+        break;
+    case Qt::DownArrow:
+        shape << rect.center() + QPoint(-4, -2)
+              << rect.center() + QPoint(0, 2)
+              << rect.center() + QPoint(4, -2);
+        break;
+    case Qt::LeftArrow:
+        shape << rect.center() + QPoint(2, -4)
+              << rect.center() + QPoint(-2, 0)
+              << rect.center() + QPoint(2, 4);
+        break;
+    case Qt::RightArrow:
+        shape << rect.center() + QPoint(-2, -4)
+              << rect.center() + QPoint(2, 0)
+              << rect.center() + QPoint(-2, 4);
+        break;
+    }
+
+    SAVE_PAINTER(p);
+
+    p->setRenderHint(QPainter::Antialiasing, true);
+    p->setPen(QPen(p->pen().brush(), 1.1));
+    p->drawPolyline(shape);
+}
+
 void Style::drawComboBox(const QStyleOptionComboBox *opt, QPainter *p, const QComboBox *combo) const
 {
     if (combo->isEditable() || (opt->state & QStyle::State_On)) {
@@ -503,19 +568,59 @@ void Style::drawComboBox(const QStyleOptionComboBox *opt, QPainter *p, const QCo
         const int yoffset = sunken ? 1 : 0;
         const QRect rect = opt->rect;
 
-        SAVE_PAINTER(p);
 
         int left = !reverse ? rect.right() - menuButtonWidth : rect.left();
         int right = !reverse ? rect.right() : rect.left() + menuButtonWidth;
         QRect arrowRect((left + right) / 2 - 3 + xoffset,
                         rect.center().y() - 1 + yoffset, 7, 4);
 
-        QPolygon arrow;
-        arrow << arrowRect.center() + QPoint(-4, -2)
-              << arrowRect.center() + QPoint(0, 2)
-              << arrowRect.center() + QPoint(4, -2);
-        p->setRenderHint(QPainter::Antialiasing, true);
-        p->setPen(QPen(p->pen().brush(), 1.1));
-        p->drawPolyline(arrow);
+        drawArrow(arrowRect, p, Qt::DownArrow);
     }
+}
+
+void Style::drawScrollBarHandle(const QStyleOption *opt, QPainter *p, Qt::Orientation orientation) const
+{
+    p->fillRect(opt->rect, opt->palette.color(QPalette::Window));
+
+    SAVE_PAINTER(p);
+
+    const QColor handleColor = !(opt->state & State_Enabled) ? opt->palette.color(QPalette::Mid)
+                             : (opt->state & State_MouseOver) ? opt->palette.color(QPalette::Highlight)
+                             : opt->palette.color(QPalette::Shadow);
+    p->setPen(Qt::NoPen);
+    p->setBrush(handleColor);
+    p->setRenderHint(QPainter::Antialiasing, true);
+
+    const int radius = (orientation == Qt::Vertical) ? opt->rect.width() / 4
+                                                     : opt->rect.height() / 4;
+    QRect handleRect = opt->rect;
+    if (orientation == Qt::Vertical) {
+        handleRect.setWidth(2 * radius);
+        handleRect.translate(radius, 0);
+    } else {
+        handleRect.setHeight(2 * radius);
+        handleRect.translate(0, radius);
+    }
+    p->drawRoundedRect(handleRect, radius, radius);
+}
+
+void Style::drawAddButton(const QStyleOption *opt, QPainter *p, Qt::Orientation orientation) const
+{
+    p->fillRect(opt->rect, opt->palette.color(QPalette::Window));
+    drawArrow(opt->rect.adjusted(1, 1, 0, 0), p, (orientation == Qt::Vertical) ? Qt::DownArrow : Qt::RightArrow);
+}
+
+void Style::drawSubButton(const QStyleOption *opt, QPainter *p, Qt::Orientation orientation) const
+{
+    p->fillRect(opt->rect, opt->palette.color(QPalette::Window));
+
+    const int arrowSize = (orientation == Qt::Vertical) ? opt->rect.width() : opt->rect.height();
+
+    const QRect button1(opt->rect.topLeft() + QPoint(1, 1), QSize(arrowSize, arrowSize));
+    drawArrow(button1, p, (orientation == Qt::Vertical) ? Qt::UpArrow : Qt::LeftArrow);
+
+    const QPoint button2Origin = (orientation == Qt::Vertical) ? opt->rect.bottomLeft() - QPoint(-1, arrowSize)
+                                                               : opt->rect.topRight() - QPoint(arrowSize, -1);
+    const QRect button2(button2Origin, QSize(arrowSize, arrowSize));
+    drawArrow(button2, p, (orientation == Qt::Vertical) ? Qt::UpArrow : Qt::LeftArrow);
 }

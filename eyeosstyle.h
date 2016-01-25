@@ -25,6 +25,7 @@
 #define EYEOS_STYLE_H
 
 #include <QProxyStyle>
+#include <Qt>
 
 class QToolButton;
 class QCheckBox;
@@ -40,8 +41,8 @@ class Style : public QProxyStyle
 public:
     explicit Style();
 
-    using QProxyStyle::polish;
     void polish(QApplication *app);
+    void polish(QWidget *widget);
     void polish(QPalette &palette);
 
     void drawPrimitive(PrimitiveElement pe, const QStyleOption *opt, QPainter *p, const QWidget *w) const;
@@ -63,7 +64,11 @@ private:
     void drawLineEditBackground(const QStyleOption *opt, QPainter *p, const QWidget *widget) const;
     void drawCheckBox(const QStyleOption *opt, QPainter *p, const QCheckBox *checkBox) const;
     void drawRadioButton(const QStyleOption *opt, QPainter *p, const QRadioButton *radioButton) const;
+    void drawArrow(QRect rect, QPainter *p, Qt::ArrowType arrow) const;
     void drawComboBox(const QStyleOptionComboBox *opt, QPainter *p, const QComboBox *combo) const;
+    void drawScrollBarHandle(const QStyleOption *opt, QPainter *p, Qt::Orientation orientation) const;
+    void drawAddButton(const QStyleOption *opt, QPainter *p, Qt::Orientation orientation) const;
+    void drawSubButton(const QStyleOption *opt, QPainter *p, Qt::Orientation orientation) const;
 };
 
 }
