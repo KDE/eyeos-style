@@ -29,6 +29,7 @@
 #include <QDateEdit>
 #include <QDateTimeEdit>
 #include <QDoubleSpinBox>
+#include <QMenuBar>
 #include <QPainter>
 #include <QPushButton>
 #include <QRadioButton>
@@ -171,19 +172,32 @@ void EyeOs::Style::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption
         }
         break;
 
+    case PE_FrameMenu:
+        drawFrame(opt, p, QPalette::Light);
+        break;
+
     case PE_IndicatorCheckBox:
-        drawCheckBox(opt, p, static_cast<const QCheckBox*>(w));
+        drawCheckBox(opt, p);
         break;
 
     case PE_IndicatorRadioButton:
-        drawRadioButton(opt, p, static_cast<const QRadioButton*>(w));
+        drawRadioButton(opt, p);
         break;
 
     case PE_IndicatorSpinUp:
+    case PE_IndicatorArrowUp:
         drawArrow(opt->rect, p, Qt::UpArrow);
         break;
     case PE_IndicatorSpinDown:
+    case PE_IndicatorArrowDown:
         drawArrow(opt->rect, p, Qt::DownArrow);
+        break;
+
+    case PE_IndicatorArrowLeft:
+        drawArrow(opt->rect, p, Qt::LeftArrow);
+        break;
+    case PE_IndicatorArrowRight:
+        drawArrow(opt->rect, p, Qt::RightArrow);
         break;
 
     case PE_PanelLineEdit:
@@ -225,6 +239,20 @@ void EyeOs::Style::drawControl(QStyle::ControlElement control, const QStyleOptio
     }
     case CE_TabBarTabShape:
         drawTabBackground(opt, p);
+        break;
+
+    case CE_MenuItem:
+        drawMenuItem(qstyleoption_cast<const QStyleOptionMenuItem*>(opt), p, w);
+        break;
+
+    case CE_MenuBarItem:
+        if (opt->state & QStyle::State_Sunken) {
+            drawLineEditBackground(opt, p, w);
+            p->setPen(opt->palette.color(QPalette::Window));
+            p->drawLine(opt->rect.bottomLeft() + QPoint(1, 0),
+                        opt->rect.bottomRight() - QPoint(1, 0));
+        }
+        QCommonStyle::drawControl(control, opt, p, w);
         break;
 
     case CE_TabBarTabLabel: {
@@ -323,12 +351,26 @@ QSize EyeOs::Style::sizeFromContents(QStyle::ContentsType type, const QStyleOpti
     QSize result = QProxyStyle::sizeFromContents(type, opt, contentsSize, w);
 
     switch (type) {
+    case CT_MenuItem:
+        if (const QStyleOptionMenuItem *menuItem = qstyleoption_cast<const QStyleOptionMenuItem *>(opt)) {
+            result.setWidth((menuItem->menuHasCheckableItems ? 19 : 0)
+                          + (menuItem->maxIconWidth ? qMax(menuItem->maxIconWidth, 20) : 0)
+                          + menuItem->fontMetrics.width(menuItem->text.left(menuItem->text.indexOf('\t')))
+                          + 16
+                          + 10);
+            if (menuItem->menuItemType == QStyleOptionMenuItem::Separator && menuItem->text.isEmpty()) {
+                result.setHeight(2);
+            } else {
+                result.setHeight(qMax(30, result.height()));
+            }
+        }
+        break;
+
     case CT_PushButton:
     case CT_CheckBox:
     case CT_RadioButton:
     case CT_ComboBox:
     case CT_ProgressBar:
-    case CT_MenuItem:
     case CT_MenuBarItem:
     case CT_MenuBar:
     case CT_Slider:
@@ -473,7 +515,9 @@ void Style::drawLineEditBackground(const QStyleOption *opt, QPainter *p, const Q
     }
 
     const QComboBox *combo = qobject_cast<const QComboBox*>(widget);
+    const QMenuBar *menuBar = qobject_cast<const QMenuBar*>(widget);
     const bool hasFrame = widget->property("frame").toBool()
+                       || (menuBar && (opt->state & QStyle::State_Sunken))
                        || (combo && (opt->state & QStyle::State_On));
 
     const QColor bgColor = opt->palette.color(QPalette::Base);
@@ -497,7 +541,7 @@ void Style::drawLineEditBackground(const QStyleOption *opt, QPainter *p, const Q
     }
 }
 
-void Style::drawCheckBox(const QStyleOption *opt, QPainter *p, const QCheckBox *checkBox) const
+void Style::drawCheckBox(const QStyleOption *opt, QPainter *p) const
 {
     SAVE_PAINTER(p);
 
@@ -510,13 +554,13 @@ void Style::drawCheckBox(const QStyleOption *opt, QPainter *p, const QCheckBox *
                                    -outlineWidth / 2 - 1,
                                    -outlineWidth / 2 - 1));
 
-    if (checkBox->isChecked()) {
+    if (opt->state & (State_On | State_NoChange)) {
         const QRect markRect = opt->rect.adjusted(4, 4, -4, -4);
 
         p->setPen(Qt::NoPen);
         p->setBrush(opt->palette.color(QPalette::Highlight));
 
-        if (checkBox->checkState() == Qt::Checked) {
+        if (opt->state & State_On) {
             p->drawRect(markRect);
         } else {
             p->drawPolygon(QVector<QPoint>() << markRect.bottomLeft()
@@ -526,7 +570,7 @@ void Style::drawCheckBox(const QStyleOption *opt, QPainter *p, const QCheckBox *
     }
 }
 
-void Style::drawRadioButton(const QStyleOption *opt, QPainter *p, const QRadioButton *radioButton) const
+void Style::drawRadioButton(const QStyleOption *opt, QPainter *p) const
 {
     SAVE_PAINTER(p);
 
@@ -540,7 +584,7 @@ void Style::drawRadioButton(const QStyleOption *opt, QPainter *p, const QRadioBu
                                       -outlineWidth / 2 - 1,
                                       -outlineWidth / 2 - 1));
 
-    if (radioButton->isChecked()) {
+    if (opt->state & State_On) {
         p->setPen(Qt::NoPen);
         p->setBrush(opt->palette.color(QPalette::Highlight));
         p->drawEllipse(opt->rect.adjusted(4, 4, -5, -5));
@@ -653,4 +697,124 @@ void Style::drawSubButton(const QStyleOption *opt, QPainter *p, Qt::Orientation 
                                                                : opt->rect.topRight() - QPoint(arrowSize, -1);
     const QRect button2(button2Origin, QSize(arrowSize, arrowSize));
     drawArrow(button2, p, (orientation == Qt::Vertical) ? Qt::UpArrow : Qt::LeftArrow);
+}
+
+void Style::drawMenuItem(const QStyleOptionMenuItem *opt, QPainter *p, const QWidget *w) const
+{
+    if (opt->menuItemType == QStyleOptionMenuItem::Separator) {
+        drawSeparator(opt, p);
+        return;
+    }
+
+    SAVE_PAINTER(p);
+
+    const bool enabled = opt->state & State_Enabled;
+    const bool active = opt->state & State_Selected;
+
+    const QColor bgColor = (active && enabled) ? opt->palette.color(QPalette::Inactive, QPalette::Highlight)
+                                               : opt->palette.color(QPalette::Window);
+    p->fillRect(opt->rect, bgColor);
+
+    const QRect contentsRect = opt->rect.adjusted(5, 0, -5, 0);
+
+    const bool showCheckbox = opt->menuHasCheckableItems;
+    const bool checkable = opt->checkType != QStyleOptionMenuItem::NotCheckable;
+    const bool checked = opt->checked;
+    const QRect checkLogicalRect(QPoint(contentsRect.left(), contentsRect.top() + (contentsRect.height() - 19) / 2),
+                                 showCheckbox ? QSize(19, 19) : QSize(0, 19));
+    const QRect checkRect = visualRect(opt->direction, opt->rect, checkLogicalRect);
+
+    if (checkable) {
+        QStyleOptionButton button;
+        button.rect = checkRect;
+        button.state = opt->state;
+        if (checked)
+            button.state |= State_On;
+        button.palette = opt->palette;
+
+        if ((opt->checkType & QStyleOptionMenuItem::Exclusive))
+            proxy()->drawPrimitive(PE_IndicatorRadioButton, &button, p, w);
+        else
+            proxy()->drawPrimitive(PE_IndicatorCheckBox, &button, p, w);
+    }
+
+    const int iconWidth = opt->maxIconWidth ? qMax(opt->maxIconWidth, 20) : 0;
+    const QRect iconLogicalRect(checkLogicalRect.right() + 5,
+                                contentsRect.top() + (contentsRect.height() - iconWidth) / 2,
+                                iconWidth,
+                                iconWidth);
+    const QRect iconRect = visualRect(opt->direction, opt->rect, iconLogicalRect);
+
+    if (!opt->icon.isNull()) {
+        const QIcon::Mode mode = (active && enabled) ? QIcon::Active
+                               : enabled ? QIcon::Normal
+                               : QIcon::Disabled;
+        const QPixmap pixmap = opt->icon.pixmap(pixelMetric(PM_SmallIconSize, opt, w), mode);
+        const QPoint iconOffset((iconRect.width() - pixmap.width()) / 2,
+                                (iconRect.height() - pixmap.height()) / 2);
+        p->drawPixmap(iconRect.topLeft() + iconOffset, pixmap);
+    }
+
+    const QColor textColor = opt->palette.color(QPalette::WindowText);
+    p->setPen(textColor);
+
+    const QRect textLogicalRect(iconLogicalRect.right() + 5,
+                                contentsRect.top(),
+                                contentsRect.width() - iconLogicalRect.right() - 5,
+                                contentsRect.height());
+    const QRect textRect = visualRect(opt->direction, opt->rect, textLogicalRect);
+
+    if (!opt->text.isEmpty()) {
+        const int textFlags = Qt::AlignVCenter
+                            | Qt::AlignLeft
+                            | Qt::TextShowMnemonic
+                            | Qt::TextDontClip
+                            | Qt::TextSingleLine;
+        const int tabIndex = opt->text.indexOf(QLatin1Char('\t'));
+        p->drawText(textRect, textFlags, opt->text.left(tabIndex));
+    }
+
+    if (opt->menuItemType == QStyleOptionMenuItem::SubMenu) {
+        const QRect arrowLogicalRect(contentsRect.right() - 16,
+                                     contentsRect.top() + (contentsRect.height() - 16) / 2,
+                                     16,
+                                     16);
+        const QRect arrowRect = visualRect(opt->direction, opt->rect, arrowLogicalRect);
+        const PrimitiveElement arrow = (opt->direction == Qt::RightToLeft) ? PE_IndicatorArrowLeft : PE_IndicatorArrowRight;
+
+        QStyleOptionMenuItem option = *opt;
+        option.rect = arrowRect;
+        option.state = opt->state & State_Enabled;
+        drawPrimitive(arrow, &option, p, w);
+    }
+}
+
+void Style::drawSeparator(const QStyleOptionMenuItem *opt, QPainter *p) const
+{
+    SAVE_PAINTER(p);
+
+    p->fillRect(opt->rect, opt->palette.color(QPalette::Window));
+
+    const QRect contentsRect = opt->rect.adjusted(5, 0, -5, 0);
+    const int textLength = !opt->text.isEmpty() ? opt->fontMetrics.width(opt->text) + 5 : 0;
+
+    if (textLength) {
+        p->setPen(opt->palette.color(QPalette::WindowText));
+        proxy()->drawItemText(p,
+                              contentsRect,
+                              Qt::AlignLeft | Qt::AlignVCenter,
+                              opt->palette,
+                              opt->state & State_Enabled,
+                              opt->text,
+                              QPalette::Text);
+    }
+
+    const bool reverse = opt->direction == Qt::RightToLeft;
+    const QPoint start(contentsRect.left() + (reverse ? 0 : textLength),
+                       opt->rect.center().y());
+    const QPoint end(contentsRect.right() - (reverse ? textLength : 0),
+                     opt->rect.center().y());
+
+    p->setPen(opt->palette.color(QPalette::Mid));
+    p->drawLine(start, end);
 }

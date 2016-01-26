@@ -32,6 +32,7 @@ class QCheckBox;
 class QComboBox;
 class QRadioButton;
 class QStyleOptionComboBox;
+class QStyleOptionMenuItem;
 class QStyleOptionSpinBox;
 
 namespace EyeOs {
@@ -50,7 +51,7 @@ public:
     void drawControl(ControlElement control, const QStyleOption *opt, QPainter *p, const QWidget *w) const;
     void drawComplexControl(ComplexControl control, const QStyleOptionComplex *opt, QPainter *p, const QWidget *w) const;
     int pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const;
-    int styleHint(StyleHint hint, const QStyleOption *opt, const QWidget *widget, QStyleHintReturn *returnData) const;
+    int styleHint(StyleHint hint, const QStyleOption *opt, const QWidget *widget, QStyleHintReturn *returnData = 0) const;
     QSize sizeFromContents(ContentsType type, const QStyleOption *opt, const QSize &contentsSize, const QWidget *w) const;
 
 private:
@@ -63,13 +64,15 @@ private:
     void drawPushButtonBackground(const QStyleOption *opt, QPainter *p) const;
     void drawToolButtonBackground(const QStyleOption *opt, QPainter *p, const QWidget *w) const;
     void drawLineEditBackground(const QStyleOption *opt, QPainter *p, const QWidget *widget) const;
-    void drawCheckBox(const QStyleOption *opt, QPainter *p, const QCheckBox *checkBox) const;
-    void drawRadioButton(const QStyleOption *opt, QPainter *p, const QRadioButton *radioButton) const;
+    void drawCheckBox(const QStyleOption *opt, QPainter *p) const;
+    void drawRadioButton(const QStyleOption *opt, QPainter *p) const;
     void drawArrow(QRect rect, QPainter *p, Qt::ArrowType arrow) const;
     void drawComboBox(const QStyleOptionComboBox *opt, QPainter *p, const QComboBox *combo) const;
     void drawScrollBarHandle(const QStyleOption *opt, QPainter *p, Qt::Orientation orientation) const;
     void drawAddButton(const QStyleOption *opt, QPainter *p, Qt::Orientation orientation) const;
     void drawSubButton(const QStyleOption *opt, QPainter *p, Qt::Orientation orientation) const;
+    void drawMenuItem(const QStyleOptionMenuItem *opt, QPainter *p, const QWidget *w) const;
+    void drawSeparator(const QStyleOptionMenuItem *opt, QPainter *p) const;
 };
 
 }
