@@ -558,13 +558,13 @@ void Style::drawCheckBox(const QStyleOption *opt, QPainter *p) const
 
     p->setPen(QPen(penColor, outlineWidth));
     p->setBrush(opt->palette.color(QPalette::Window));
-    p->drawRect(opt->rect.adjusted(outlineWidth / 2,
-                                   outlineWidth / 2,
+    p->drawRect(opt->rect.adjusted(outlineWidth / 2 + 1,
+                                   outlineWidth / 2 + 1,
                                    -outlineWidth / 2 - 1,
                                    -outlineWidth / 2 - 1));
 
     if (opt->state & (State_On | State_NoChange)) {
-        const QRect markRect = opt->rect.adjusted(4, 4, -4, -4);
+        const QRect markRect = opt->rect.adjusted(4, 4, -3, -3);
 
         p->setPen(Qt::NoPen);
         p->setBrush(opt->palette.color(QPalette::Highlight));
