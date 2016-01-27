@@ -331,6 +331,14 @@ void EyeOs::Style::drawComplexControl(ComplexControl control, const QStyleOption
 int EyeOs::Style::pixelMetric(QStyle::PixelMetric metric, const QStyleOption *option, const QWidget *widget) const
 {
     switch (metric) {
+    case PM_LayoutTopMargin:
+        return 13;
+    case PM_LayoutLeftMargin:
+    case PM_LayoutRightMargin:
+        return 15;
+    case PM_LayoutBottomMargin:
+        return 20;
+
     case PM_ExclusiveIndicatorWidth:
     case PM_ExclusiveIndicatorHeight:
         return 18;
