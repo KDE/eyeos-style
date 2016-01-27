@@ -237,10 +237,6 @@ void EyeOs::Style::drawControl(QStyle::ControlElement control, const QStyleOptio
         QProxyStyle::drawControl(control, &button, p, w);
         break;
     }
-    case CE_TabBarTabShape:
-        drawTabBackground(opt, p);
-        break;
-
     case CE_MenuItem:
         drawMenuItem(qstyleoption_cast<const QStyleOptionMenuItem*>(opt), p, w);
         break;
@@ -253,6 +249,10 @@ void EyeOs::Style::drawControl(QStyle::ControlElement control, const QStyleOptio
                         opt->rect.bottomRight() - QPoint(1, 0));
         }
         QCommonStyle::drawControl(control, opt, p, w);
+        break;
+
+    case CE_TabBarTabShape:
+        drawTabBackground(opt, p);
         break;
 
     case CE_TabBarTabLabel: {
