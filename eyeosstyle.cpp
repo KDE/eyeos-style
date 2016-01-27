@@ -178,6 +178,10 @@ void EyeOs::Style::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption
         drawFrame(opt, p, QPalette::Light);
         break;
 
+    case PE_IndicatorDockWidgetResizeHandle:
+        drawSplitterHandle(opt, p);
+        break;
+
     case PE_IndicatorCheckBox:
         drawCheckBox(opt, p);
         break;
@@ -265,6 +269,10 @@ void EyeOs::Style::drawControl(QStyle::ControlElement control, const QStyleOptio
         QProxyStyle::drawControl(control, &tab, p, w);
         break;
     }
+
+    case CE_Splitter:
+        drawSplitterHandle(opt, p);
+        break;
 
     case CE_HeaderSection:
         drawHeaderSection(opt, p);
@@ -923,4 +931,18 @@ void Style::drawSlider(const QStyleOptionSlider *opt, QPainter *p, const QWidget
         p->setRenderHint(QPainter::Antialiasing, true);
         p->drawEllipse(handleRect.adjusted(1, 1, -1, -1));
     }
+}
+
+void Style::drawSplitterHandle(const QStyleOption *opt, QPainter *p) const
+{
+    SAVE_PAINTER(p);
+
+    const QColor color = (opt->state & State_Enabled) ? opt->palette.color(QPalette::Mid)
+                                                      : opt->palette.color(QPalette::Light);
+    const QPoint start = (opt->state & State_Horizontal) ? QPoint(opt->rect.left(), opt->rect.center().y())
+                                                         : QPoint(opt->rect.center().x(), opt->rect.top());
+    const QPoint end = (opt->state & State_Horizontal) ? QPoint(opt->rect.right(), opt->rect.center().y())
+                                                       : QPoint(opt->rect.center().x(), opt->rect.bottom());
+    p->setPen(color);
+    p->drawLine(start, end);
 }

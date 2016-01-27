@@ -77,6 +77,7 @@ private:
     void drawSeparator(const QStyleOptionMenuItem *opt, QPainter *p) const;
     void drawHeaderSection(const QStyleOption *opt, QPainter *p) const;
     void drawSlider(const QStyleOptionSlider *opt, QPainter *p, const QWidget *w) const;
+    void drawSplitterHandle(const QStyleOption *opt, QPainter *p) const;
 };
 
 }
