@@ -159,6 +159,7 @@ void EyeOs::Style::polish(QPalette &palette)
 void EyeOs::Style::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption *opt, QPainter *p, const QWidget *w) const
 {
     switch (pe) {
+    case PE_FrameGroupBox:
     case PE_FrameTabWidget:
     case PE_FrameWindow:
         drawFrame(opt, p);
