@@ -381,6 +381,9 @@ QSize EyeOs::Style::sizeFromContents(QStyle::ContentsType type, const QStyleOpti
         result.setHeight(qMax(30, result.height()));
         break;
 
+    case CT_ItemViewItem:
+        result.setHeight(result.height() + 2 * pixelMetric(PM_FocusFrameVMargin, opt, w));
+
     default:
         break;
     }
@@ -549,6 +552,7 @@ void Style::drawCheckBox(const QStyleOption *opt, QPainter *p) const
     const int outlineWidth = frameWidth();
 
     p->setPen(QPen(penColor, outlineWidth));
+    p->setBrush(opt->palette.color(QPalette::Window));
     p->drawRect(opt->rect.adjusted(outlineWidth / 2,
                                    outlineWidth / 2,
                                    -outlineWidth / 2 - 1,
@@ -579,6 +583,7 @@ void Style::drawRadioButton(const QStyleOption *opt, QPainter *p) const
 
     p->setRenderHint(QPainter::Antialiasing, true);
     p->setPen(QPen(penColor, outlineWidth));
+    p->setBrush(opt->palette.color(QPalette::Window));
     p->drawEllipse(opt->rect.adjusted(outlineWidth / 2,
                                       outlineWidth / 2,
                                       -outlineWidth / 2 - 1,
