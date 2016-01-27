@@ -24,6 +24,8 @@
 #include "eyeosstyle.h"
 
 #include <QApplication>
+#include <QDir>
+#include <QFontDatabase>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDateEdit>
@@ -77,11 +79,21 @@ Style::Style()
     : QProxyStyle(QStyleFactory::create("plastique"))
 {
     setObjectName("eyeOS");
+
+    QStringList filters;
+    filters << "*.ttf";
+    QDir dir(":/eyeos-style/fonts");
+    dir.setNameFilters(filters);
+    dir.setFilter(QDir::Files);
+
+    foreach (const QString &font, dir.entryList()) {
+        QFontDatabase::addApplicationFont(dir.path() + '/' + font);
+    }
 }
 
 void Style::polish(QApplication *app)
 {
-    QFont font("Sans");
+    QFont font("Source Sans Pro");
     font.setPixelSize(16);
     app->setFont(font);
 }

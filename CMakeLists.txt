@@ -13,6 +13,7 @@ set(eyeosstyle_SRCS
     eyeosstyle.cpp
     eyeosstyleplugin.cpp
 )
+qt4_add_resources(eyeosstyle_SRCS eyeosresources.qrc)
 kde4_add_plugin(eyeos ${eyeosstyle_SRCS})
 target_link_libraries(eyeos ${KDE4_KDEUI_LIBS})
 
