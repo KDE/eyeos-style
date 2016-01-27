@@ -264,6 +264,10 @@ void EyeOs::Style::drawControl(QStyle::ControlElement control, const QStyleOptio
         break;
     }
 
+    case CE_HeaderSection:
+        drawHeaderSection(opt, p);
+        break;
+
     case CE_ScrollBarAddPage:
     case CE_ScrollBarSubPage:
         p->fillRect(opt->rect, opt->palette.color(QPalette::Window));
@@ -822,4 +826,22 @@ void Style::drawSeparator(const QStyleOptionMenuItem *opt, QPainter *p) const
 
     p->setPen(opt->palette.color(QPalette::Mid));
     p->drawLine(start, end);
+}
+
+void Style::drawHeaderSection(const QStyleOption *opt, QPainter *p) const
+{
+    SAVE_PAINTER(p);
+
+    const QColor bgColor = (opt->state & State_On) ? opt->palette.color(QPalette::Light)
+                                                   : opt->palette.color(QPalette::AlternateBase);
+    p->fillRect(opt->rect, bgColor);
+
+    const QColor penColor = opt->palette.color(QPalette::Mid);
+    const QPoint bottomLeft = opt->rect.bottomLeft();// - QPoint(0, 1);
+    const QPoint bottomRight = opt->rect.bottomRight();// - QPoint(0, 1);
+    const QPoint topRight = opt->rect.topRight();
+
+    p->setPen(penColor);
+    p->drawLine(bottomLeft, bottomRight);
+    p->drawLine(bottomRight, topRight);
 }

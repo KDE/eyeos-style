@@ -73,6 +73,7 @@ private:
     void drawSubButton(const QStyleOption *opt, QPainter *p, Qt::Orientation orientation) const;
     void drawMenuItem(const QStyleOptionMenuItem *opt, QPainter *p, const QWidget *w) const;
     void drawSeparator(const QStyleOptionMenuItem *opt, QPainter *p) const;
+    void drawHeaderSection(const QStyleOption *opt, QPainter *p) const;
 };
 
 }
