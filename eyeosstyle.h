@@ -33,6 +33,7 @@ class QComboBox;
 class QRadioButton;
 class QStyleOptionComboBox;
 class QStyleOptionMenuItem;
+class QStyleOptionSlider;
 class QStyleOptionSpinBox;
 
 namespace EyeOs {
@@ -53,6 +54,7 @@ public:
     int pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const;
     int styleHint(StyleHint hint, const QStyleOption *opt, const QWidget *widget, QStyleHintReturn *returnData = 0) const;
     QSize sizeFromContents(ContentsType type, const QStyleOption *opt, const QSize &contentsSize, const QWidget *w) const;
+    QRect subControlRect(ComplexControl control, const QStyleOptionComplex *opt, SubControl subControl, const QWidget *w) const;
 
 private:
     int tabSpacing() const;
@@ -74,6 +76,7 @@ private:
     void drawMenuItem(const QStyleOptionMenuItem *opt, QPainter *p, const QWidget *w) const;
     void drawSeparator(const QStyleOptionMenuItem *opt, QPainter *p) const;
     void drawHeaderSection(const QStyleOption *opt, QPainter *p) const;
+    void drawSlider(const QStyleOptionSlider *opt, QPainter *p, const QWidget *w) const;
 };
 
 }

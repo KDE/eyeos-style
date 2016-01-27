@@ -88,7 +88,8 @@ void Style::polish(QApplication *app)
 
 void Style::polish(QWidget *widget)
 {
-    if (qobject_cast<QScrollBar*>(widget)) {
+    if (qobject_cast<QScrollBar*>(widget)
+     || qobject_cast<QSlider*>(widget)) {
         widget->setAttribute(Qt::WA_Hover);
     }
 }
@@ -310,6 +311,9 @@ void EyeOs::Style::drawComplexControl(ComplexControl control, const QStyleOption
         QCommonStyle::drawComplexControl(control, &option, p, w);
         break;
     }
+    case CC_Slider:
+        drawSlider(qstyleoption_cast<const QStyleOptionSlider*>(opt), p, w);
+        break;
 
     default:
         QProxyStyle::drawComplexControl(control, opt, p, w);
@@ -388,6 +392,40 @@ QSize EyeOs::Style::sizeFromContents(QStyle::ContentsType type, const QStyleOpti
 
     case CT_ItemViewItem:
         result.setHeight(result.height() + 2 * pixelMetric(PM_FocusFrameVMargin, opt, w));
+
+    default:
+        break;
+    }
+
+    return result;
+}
+
+QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *opt, SubControl subControl, const QWidget *w) const
+{
+    QRect result = QProxyStyle::subControlRect(control, opt, subControl, w);
+
+    switch (control) {
+    case CC_Slider:
+        switch (subControl) {
+        case SC_SliderGroove: {
+            const QSlider *slider = qobject_cast<const QSlider*>(w);
+            Q_ASSERT(slider);
+            if (slider->orientation() == Qt::Horizontal)
+                result.setY((opt->rect.height() - result.height()) / 2);
+            else
+                result.setX((opt->rect.width() - result.width()) / 2);
+            break;
+        }
+        case SC_SliderHandle: {
+            const int size = qMax(result.height(), result.width()) - 2;
+            result = QRect(result.center() - QPoint(size / 2, size / 2), QSize(size, size));
+            break;
+        }
+
+        default:
+            break;
+        }
+        break;
 
     default:
         break;
@@ -845,4 +883,44 @@ void Style::drawHeaderSection(const QStyleOption *opt, QPainter *p) const
     p->setPen(penColor);
     p->drawLine(bottomLeft, bottomRight);
     p->drawLine(bottomRight, topRight);
+}
+
+void Style::drawSlider(const QStyleOptionSlider *opt, QPainter *p, const QWidget *w) const
+{
+    SAVE_PAINTER(p);
+
+    if (opt->subControls & SC_SliderGroove) {
+        QRect grooveRect = subControlRect(CC_Slider, opt, SC_SliderGroove, w);
+        const QColor grooveColor = opt->palette.color(QPalette::Light);
+
+        p->setPen(Qt::NoPen);
+        p->setBrush(grooveColor);
+        p->setRenderHint(QPainter::Antialiasing, true);
+
+        const int radius = (opt->orientation == Qt::Vertical) ? grooveRect.width() / 4
+                                                              : grooveRect.height() / 4;
+        if (opt->orientation == Qt::Vertical) {
+            grooveRect.setWidth(2 * radius);
+            grooveRect.translate(radius, 0);
+        } else {
+            grooveRect.setHeight(2 * radius);
+            grooveRect.translate(0, radius);
+        }
+        p->drawRoundedRect(grooveRect, radius, radius);
+    }
+
+    if (opt->subControls & SC_SliderHandle) {
+        const QRect handleRect = subControlRect(CC_Slider, opt, SC_SliderHandle, w);
+        const bool isActive = opt->activeSubControls & SC_SliderHandle;
+        const bool isEnabled = opt->state & State_Enabled;
+
+        const QColor bgColor = opt->palette.color(QPalette::Window);
+        const QColor outlineColor = !isEnabled ? opt->palette.color(QPalette::Light)
+                                  : isActive ? opt->palette.color(QPalette::Highlight)
+                                  : opt->palette.color(QPalette::Mid);
+        p->setPen(outlineColor);
+        p->setBrush(bgColor);
+        p->setRenderHint(QPainter::Antialiasing, true);
+        p->drawEllipse(handleRect.adjusted(1, 1, -1, -1));
+    }
 }
