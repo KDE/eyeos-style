@@ -41,6 +41,7 @@
 #include <QStyleOption>
 #include <QTimeEdit>
 #include <QToolButton>
+#include <QSplitter>
 
 #include <KActionMenu>
 
@@ -191,7 +192,7 @@ void EyeOs::Style::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption
         break;
 
     case PE_IndicatorDockWidgetResizeHandle:
-        drawSplitterHandle(opt, p);
+        drawSplitterHandle(opt, p, (opt->state & State_Horizontal) ? Qt::Horizontal : Qt::Vertical);
         break;
 
     case PE_IndicatorCheckBox:
@@ -283,7 +284,9 @@ void EyeOs::Style::drawControl(QStyle::ControlElement control, const QStyleOptio
     }
 
     case CE_Splitter:
-        drawSplitterHandle(opt, p);
+        if (const QSplitter *splitter = qobject_cast<const QSplitter*>(w)) {
+            drawSplitterHandle(opt, p, splitter->orientation());
+        }
         break;
 
     case CE_HeaderSection:
@@ -953,15 +956,15 @@ void Style::drawSlider(const QStyleOptionSlider *opt, QPainter *p, const QWidget
     }
 }
 
-void Style::drawSplitterHandle(const QStyleOption *opt, QPainter *p) const
+void Style::drawSplitterHandle(const QStyleOption *opt, QPainter *p, Qt::Orientation orientation) const
 {
     SAVE_PAINTER(p);
 
     const QColor color = (opt->state & State_Enabled) ? opt->palette.color(QPalette::Mid)
                                                       : opt->palette.color(QPalette::Light);
-    const QPoint start = (opt->state & State_Horizontal) ? QPoint(opt->rect.left(), opt->rect.center().y())
+    const QPoint start = (orientation == Qt::Vertical) ? QPoint(opt->rect.left(), opt->rect.center().y())
                                                          : QPoint(opt->rect.center().x(), opt->rect.top());
-    const QPoint end = (opt->state & State_Horizontal) ? QPoint(opt->rect.right(), opt->rect.center().y())
+    const QPoint end = (orientation == Qt::Vertical) ? QPoint(opt->rect.right(), opt->rect.center().y())
                                                        : QPoint(opt->rect.center().x(), opt->rect.bottom());
     p->setPen(color);
     p->drawLine(start, end);
