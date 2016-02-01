@@ -249,6 +249,7 @@ void EyeOs::Style::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption
 void EyeOs::Style::drawControl(QStyle::ControlElement control, const QStyleOption *opt, QPainter *p, const QWidget *w) const
 {
     switch (control) {
+#if 0
     case CE_PushButtonLabel: {
         QStyleOptionButton button = *qstyleoption_cast<const QStyleOptionButton*>(opt);
         if (!button.text.isEmpty())
@@ -256,6 +257,7 @@ void EyeOs::Style::drawControl(QStyle::ControlElement control, const QStyleOptio
         QProxyStyle::drawControl(control, &button, p, w);
         break;
     }
+#endif
     case CE_MenuItem:
         drawMenuItem(qstyleoption_cast<const QStyleOptionMenuItem*>(opt), p, w);
         break;
