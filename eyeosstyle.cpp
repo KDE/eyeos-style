@@ -250,15 +250,17 @@ void EyeOs::Style::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption
 void EyeOs::Style::drawControl(QStyle::ControlElement control, const QStyleOption *opt, QPainter *p, const QWidget *w) const
 {
     switch (control) {
-#if 0
     case CE_PushButtonLabel: {
-        QStyleOptionButton button = *qstyleoption_cast<const QStyleOptionButton*>(opt);
-        if (!button.text.isEmpty())
-            button.icon = QIcon();
-        QProxyStyle::drawControl(control, &button, p, w);
+        const QPushButton *button = qobject_cast<const QPushButton*>(w);
+        const bool isDefault = (opt->state & QStyle::State_HasFocus)
+                            || (button && button->isDefault());
+        const bool isFlat = button && button->isFlat();
+        QStyleOptionButton option = *qstyleoption_cast<const QStyleOptionButton*>(opt);
+        if (isDefault && !isFlat)
+            option.palette.setColor(QPalette::ButtonText, option.palette.color(QPalette::HighlightedText));
+        QProxyStyle::drawControl(control, &option, p, w);
         break;
     }
-#endif
     case CE_MenuItem:
         drawMenuItem(qstyleoption_cast<const QStyleOptionMenuItem*>(opt), p, w);
         break;
