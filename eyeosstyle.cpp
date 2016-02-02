@@ -236,7 +236,7 @@ void EyeOs::Style::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption
          && !qobject_cast<const QDateEdit*>(w)
          && !qobject_cast<const QSpinBox*>(w)
          && !qobject_cast<const QTimeEdit*>(w)) {
-            drawPushButtonBackground(opt, p);
+            drawPushButtonBackground(opt, p, w);
         }
         break;
 
@@ -538,15 +538,17 @@ void Style::drawTabBackground(const QStyleOption *opt, QPainter *p) const
     }
 }
 
-void Style::drawPushButtonBackground(const QStyleOption *opt, QPainter *p) const
+void Style::drawPushButtonBackground(const QStyleOption *opt, QPainter *p, const QWidget *w) const
 {
+    const QPushButton *button = qobject_cast<const QPushButton *>(w);
     const bool enabled = opt->state & QStyle::State_Enabled;
     const bool mouseOver = opt->state & QStyle::State_MouseOver;
-    const bool hasFocus = opt->state & QStyle::State_HasFocus;
+    const bool isDefault = (opt->state & QStyle::State_HasFocus)
+                        || (button && button->isDefault());
 
     const QColor bgColor = !enabled ? opt->palette.color(QPalette::Button)
-                         : (mouseOver && !hasFocus) ? opt->palette.color(QPalette::Inactive, QPalette::Highlight)
-                         : hasFocus ? opt->palette.color(QPalette::Active, QPalette::Highlight)
+                         : (mouseOver && !isDefault) ? opt->palette.color(QPalette::Inactive, QPalette::Highlight)
+                         : isDefault ? opt->palette.color(QPalette::Active, QPalette::Highlight)
                          : opt->palette.color(QPalette::Button);
 
     p->fillRect(opt->rect, bgColor);

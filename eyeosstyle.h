@@ -63,7 +63,7 @@ private:
 
     void drawFrame(const QStyleOption *opt, QPainter *p, QPalette::ColorRole colorRole = QPalette::Mid) const;
     void drawTabBackground(const QStyleOption *opt, QPainter *p) const;
-    void drawPushButtonBackground(const QStyleOption *opt, QPainter *p) const;
+    void drawPushButtonBackground(const QStyleOption *opt, QPainter *p, const QWidget *w) const;
     void drawToolButtonBackground(const QStyleOption *opt, QPainter *p, const QWidget *w) const;
     void drawLineEditBackground(const QStyleOption *opt, QPainter *p, const QWidget *widget) const;
     void drawCheckBox(const QStyleOption *opt, QPainter *p) const;
