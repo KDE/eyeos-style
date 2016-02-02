@@ -376,6 +376,8 @@ int EyeOs::Style::pixelMetric(QStyle::PixelMetric metric, const QStyleOption *op
         return tabSpacing() + QProxyStyle::pixelMetric(metric, option, widget);
     case PM_TabBarTabVSpace:
         return activeLineWidth() + QProxyStyle::pixelMetric(metric, option, widget);
+    case PM_SplitterWidth:
+        return 1;
     default:
         return QProxyStyle::pixelMetric(metric, option, widget);
     }
