@@ -101,7 +101,8 @@ void Style::polish(QApplication *app)
 
 void Style::polish(QWidget *widget)
 {
-    if (qobject_cast<QScrollBar*>(widget)
+    if (qobject_cast<QPushButton*>(widget)
+     || qobject_cast<QScrollBar*>(widget)
      || qobject_cast<QSlider*>(widget)) {
         widget->setAttribute(Qt::WA_Hover);
     }
