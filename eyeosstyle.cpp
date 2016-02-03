@@ -351,6 +351,11 @@ void EyeOs::Style::drawComplexControl(ComplexControl control, const QStyleOption
 int EyeOs::Style::pixelMetric(QStyle::PixelMetric metric, const QStyleOption *option, const QWidget *widget) const
 {
     switch (metric) {
+    case PM_ButtonIconSize:
+    case PM_ToolBarIconSize:
+    case PM_IconViewIconSize:
+        return 22;
+
     case PM_LayoutTopMargin:
         return 13;
     case PM_LayoutLeftMargin:
@@ -425,7 +430,7 @@ QSize EyeOs::Style::sizeFromContents(QStyle::ContentsType type, const QStyleOpti
     case CT_SpinBox:
     case CT_DialogButtons:
     case CT_HeaderSection:
-        result.setHeight(qMax(30, result.height()));
+        result.setHeight(qMax(40, result.height()));
         break;
 
     case CT_ItemViewItem:
