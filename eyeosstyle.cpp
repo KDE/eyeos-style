@@ -23,6 +23,7 @@
 
 #include "eyeosstyle.h"
 
+#include <QAbstractItemView>
 #include <QApplication>
 #include <QDir>
 #include <QFontDatabase>
@@ -105,6 +106,13 @@ void Style::polish(QWidget *widget)
      || qobject_cast<QScrollBar*>(widget)
      || qobject_cast<QSlider*>(widget)) {
         widget->setAttribute(Qt::WA_Hover);
+    }
+
+    if (qobject_cast<QAbstractItemView*>(widget)) {
+        QPalette palette = widget->palette();
+        palette.setColor(QPalette::Highlight, palette.color(QPalette::Light));
+        palette.setColor(QPalette::HighlightedText, palette.color(QPalette::WindowText));
+        widget->setPalette(palette);
     }
 }
 
@@ -434,7 +442,7 @@ QSize EyeOs::Style::sizeFromContents(QStyle::ContentsType type, const QStyleOpti
         break;
 
     case CT_ItemViewItem:
-        result.setHeight(result.height() + 2 * pixelMetric(PM_FocusFrameVMargin, opt, w));
+        result.setHeight(qMax(52, result.height() + 2 * pixelMetric(PM_FocusFrameVMargin, opt, w)));
 
     default:
         break;
