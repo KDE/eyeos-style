@@ -312,20 +312,14 @@ void EyeOs::Style::drawControl(QStyle::ControlElement control, const QStyleOptio
         break;
 
     case CE_ScrollBarSlider:
-        if (const QScrollBar *scrollBar = qobject_cast<const QScrollBar*>(w)) {
-            drawScrollBarHandle(opt, p, scrollBar->orientation());
-        }
+        drawScrollBarHandle(opt, p, (opt->state & State_Horizontal) ? Qt::Horizontal : Qt::Vertical);
         break;
 
     case CE_ScrollBarAddLine:
-        if (const QScrollBar *scrollBar = qobject_cast<const QScrollBar*>(w)) {
-            drawAddButton(opt, p, scrollBar->orientation());
-        }
+        drawAddButton(opt, p, (opt->state & State_Horizontal) ? Qt::Horizontal : Qt::Vertical);
         break;
     case CE_ScrollBarSubLine:
-        if (const QScrollBar *scrollBar = qobject_cast<const QScrollBar*>(w)) {
-            drawSubButton(opt, p, scrollBar->orientation());
-        }
+        drawSubButton(opt, p, (opt->state & State_Horizontal) ? Qt::Horizontal : Qt::Vertical);
         break;
 
     default:
