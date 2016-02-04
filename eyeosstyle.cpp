@@ -138,15 +138,15 @@ void EyeOs::Style::polish(QPalette &palette)
 //    palette.setColor(QPalette::Disabled, QPalette::ToolTipBase, QColor());
 //    palette.setColor(QPalette::Disabled, QPalette::ToolTipText, QColor());
 
-    palette.setColor(QPalette::Inactive, QPalette::WindowText, QColor("#000000"));
+    palette.setColor(QPalette::Inactive, QPalette::WindowText, QColor("#515668"));
     palette.setColor(QPalette::Inactive, QPalette::Button, QColor("#E7E9EE"));
     palette.setColor(QPalette::Inactive, QPalette::Light, QColor("#E7E9EE"));
 //    palette.setColor(QPalette::Inactive, QPalette::Midlight, QColor());
 //    palette.setColor(QPalette::Inactive, QPalette::Dark, QColor());
     palette.setColor(QPalette::Inactive, QPalette::Mid, QColor("#C8CDD8"));
-    palette.setColor(QPalette::Inactive, QPalette::Text, QColor("#000000"));
-    palette.setColor(QPalette::Inactive, QPalette::BrightText, QColor("#000000"));
-    palette.setColor(QPalette::Inactive, QPalette::ButtonText, QColor("#000000"));
+    palette.setColor(QPalette::Inactive, QPalette::Text, QColor("#515668"));
+    palette.setColor(QPalette::Inactive, QPalette::BrightText, QColor("#515668"));
+    palette.setColor(QPalette::Inactive, QPalette::ButtonText, QColor("#515668"));
     palette.setColor(QPalette::Inactive, QPalette::Base, QColor("#FFFFFF"));
     palette.setColor(QPalette::Inactive, QPalette::Window, QColor("#FFFFFF"));
     palette.setColor(QPalette::Inactive, QPalette::Shadow, QColor("#858FA9"));
@@ -158,15 +158,15 @@ void EyeOs::Style::polish(QPalette &palette)
 //    palette.setColor(QPalette::Inactive, QPalette::ToolTipBase, QColor());
 //    palette.setColor(QPalette::Inactive, QPalette::ToolTipText, QColor());
 
-    palette.setColor(QPalette::Active, QPalette::WindowText, QColor("#000000"));
+    palette.setColor(QPalette::Active, QPalette::WindowText, QColor("#515668"));
     palette.setColor(QPalette::Active, QPalette::Button, QColor("#E7E9EE"));
     palette.setColor(QPalette::Active, QPalette::Light, QColor("#E7E9EE"));
 //    palette.setColor(QPalette::Active, QPalette::Midlight, QColor());
 //    palette.setColor(QPalette::Active, QPalette::Dark, QColor());
     palette.setColor(QPalette::Active, QPalette::Mid, QColor("#C8CDD8"));
-    palette.setColor(QPalette::Active, QPalette::Text, QColor("#000000"));
-    palette.setColor(QPalette::Active, QPalette::BrightText, QColor("#000000"));
-    palette.setColor(QPalette::Active, QPalette::ButtonText, QColor("#000000"));
+    palette.setColor(QPalette::Active, QPalette::Text, QColor("#515668"));
+    palette.setColor(QPalette::Active, QPalette::BrightText, QColor("#515668"));
+    palette.setColor(QPalette::Active, QPalette::ButtonText, QColor("#515668"));
     palette.setColor(QPalette::Active, QPalette::Base, QColor("#FFFFFF"));
     palette.setColor(QPalette::Active, QPalette::Window, QColor("#FFFFFF"));
     palette.setColor(QPalette::Active, QPalette::Shadow, QColor("#858FA9"));
