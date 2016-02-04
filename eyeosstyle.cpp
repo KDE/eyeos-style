@@ -195,6 +195,28 @@ void EyeOs::Style::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption
         drawFrame(opt, p);
         break;
 
+    case PE_IndicatorBranch: {
+        if (w->inherits("MessageList::Core::View")) {
+            if (opt->state & State_Children) {
+
+                // draw "+" or "-"
+                //painter->setPen(alphaTextColor);
+                p->save();
+                QPoint center = opt->rect.center();
+                p->fillRect(QRect(center.x() - 10, center.y() - 10, 20, 20), Qt::white);
+                QPen pen = p->pen();
+                pen.setWidth(2);
+                p->setPen(pen);
+                p->drawLine(center.x() - 4, center.y(), center.x() + 4, center.y());
+                if (!(opt->state & State_Open))
+                    p->drawLine(center.x(), center.y() - 4, center.x(), center.y() + 4);
+                p->restore();
+            }
+        } else {
+            QProxyStyle::drawPrimitive(pe, opt, p, w);
+        }
+    }
+        break;
     case PE_Frame:
         if (qobject_cast<QComboBox*>(w->parentWidget())) {
             drawFrame(opt, p, QPalette::Light);
