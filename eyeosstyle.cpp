@@ -109,10 +109,17 @@ void Style::polish(QWidget *widget)
     }
 
     if (qobject_cast<QAbstractItemView*>(widget)) {
-        QPalette palette = widget->palette();
-        palette.setColor(QPalette::Highlight, palette.color(QPalette::Light));
-        palette.setColor(QPalette::HighlightedText, palette.color(QPalette::WindowText));
-        widget->setPalette(palette);
+        if (widget->inherits("MessageList::Core::View")) {
+            QPalette palette = widget->palette();
+            palette.setColor(QPalette::Highlight, palette.color(QPalette::AlternateBase));
+            palette.setColor(QPalette::HighlightedText, palette.color(QPalette::WindowText));
+            widget->setPalette(palette);
+        } else {
+            QPalette palette = widget->palette();
+            palette.setColor(QPalette::Highlight, palette.color(QPalette::Light));
+            palette.setColor(QPalette::HighlightedText, palette.color(QPalette::WindowText));
+            widget->setPalette(palette);
+        }
     }
 }
 
@@ -321,7 +328,6 @@ void EyeOs::Style::drawControl(QStyle::ControlElement control, const QStyleOptio
     case CE_ScrollBarSubLine:
         drawSubButton(opt, p, (opt->state & State_Horizontal) ? Qt::Horizontal : Qt::Vertical);
         break;
-
     default:
         QProxyStyle::drawControl(control, opt, p, w);
         break;
