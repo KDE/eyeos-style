@@ -121,7 +121,7 @@ void EyeOs::Style::polish(QPalette &palette)
     palette.setColor(QPalette::Disabled, QPalette::WindowText, QColor("#777777"));
     palette.setColor(QPalette::Disabled, QPalette::Button, QColor("#E7E9EE"));
     palette.setColor(QPalette::Disabled, QPalette::Light, QColor("#E7E9EE"));
-//    palette.setColor(QPalette::Disabled, QPalette::Midlight, QColor());
+    palette.setColor(QPalette::Disabled, QPalette::Midlight, QColor("#97A1B8"));
 //    palette.setColor(QPalette::Disabled, QPalette::Dark, QColor());
     palette.setColor(QPalette::Disabled, QPalette::Mid, QColor("#C8CDD8"));
     palette.setColor(QPalette::Disabled, QPalette::Text, QColor("#777777"));
@@ -141,7 +141,7 @@ void EyeOs::Style::polish(QPalette &palette)
     palette.setColor(QPalette::Inactive, QPalette::WindowText, QColor("#515668"));
     palette.setColor(QPalette::Inactive, QPalette::Button, QColor("#E7E9EE"));
     palette.setColor(QPalette::Inactive, QPalette::Light, QColor("#E7E9EE"));
-//    palette.setColor(QPalette::Inactive, QPalette::Midlight, QColor());
+    palette.setColor(QPalette::Inactive, QPalette::Midlight, QColor("#97A1B8"));
 //    palette.setColor(QPalette::Inactive, QPalette::Dark, QColor());
     palette.setColor(QPalette::Inactive, QPalette::Mid, QColor("#C8CDD8"));
     palette.setColor(QPalette::Inactive, QPalette::Text, QColor("#515668"));
@@ -161,7 +161,7 @@ void EyeOs::Style::polish(QPalette &palette)
     palette.setColor(QPalette::Active, QPalette::WindowText, QColor("#515668"));
     palette.setColor(QPalette::Active, QPalette::Button, QColor("#E7E9EE"));
     palette.setColor(QPalette::Active, QPalette::Light, QColor("#E7E9EE"));
-//    palette.setColor(QPalette::Active, QPalette::Midlight, QColor());
+    palette.setColor(QPalette::Active, QPalette::Midlight, QColor("#97A1B8"));
 //    palette.setColor(QPalette::Active, QPalette::Dark, QColor());
     palette.setColor(QPalette::Active, QPalette::Mid, QColor("#C8CDD8"));
     palette.setColor(QPalette::Active, QPalette::Text, QColor("#515668"));
