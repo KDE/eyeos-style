@@ -479,6 +479,33 @@ QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *o
     return result;
 }
 
+QRect Style::subElementRect(QStyle::SubElement element, const QStyleOption *opt, const QWidget *w) const
+{
+    QRect result = QProxyStyle::subElementRect(element, opt, w);
+
+    switch (element) {
+    case SE_ItemViewItemFocusRect:
+        result.adjust(-5, 0, 0, 0);
+        // fall through
+    case SE_ItemViewItemText: {
+        const QStyleOptionViewItemV4 *option = qstyleoption_cast<const QStyleOptionViewItemV4*>(opt);
+        if (option && option->index.parent().isValid())
+            result.adjust(15, 0, 0, 0);
+        else
+            result.adjust(-5, 0, 0, 0);
+        break;
+    }
+    case SE_ItemViewItemDecoration:
+        result.translate(-3, 0);
+        break;
+
+    default:
+        break;
+    }
+
+    return result;
+}
+
 int Style::tabSpacing() const
 {
     return 5;
