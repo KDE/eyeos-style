@@ -467,7 +467,7 @@ QSize EyeOs::Style::sizeFromContents(QStyle::ContentsType type, const QStyleOpti
         break;
 
     case CT_ItemViewItem:
-        result.setHeight(qMax(52, result.height() + 2 * pixelMetric(PM_FocusFrameVMargin, opt, w)));
+        result.setHeight(qMax(40, result.height() + 2 * pixelMetric(PM_FocusFrameVMargin, opt, w)));
 
     default:
         break;
