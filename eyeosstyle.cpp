@@ -32,6 +32,7 @@
 #include <QDateEdit>
 #include <QDateTimeEdit>
 #include <QDoubleSpinBox>
+#include <QKeyEvent>
 #include <QMenuBar>
 #include <QPainter>
 #include <QPushButton>
@@ -77,8 +78,58 @@ private:
     PainterStateSaver _painter_state_saver(p); \
     Q_UNUSED(_painter_state_saver);
 
+class MnemonicsEventFilter : public QObject
+{
+public:
+    explicit MnemonicsEventFilter(QObject *parent = 0)
+        : QObject(parent),
+          m_enabled(false)
+    {
+    }
+
+    bool eventFilter(QObject *, QEvent *event)
+    {
+        switch (event->type()) {
+        case QEvent::KeyPress:
+            if(static_cast<QKeyEvent*>(event)->key() == Qt::Key_Alt) {
+                setEnabled(true);
+            }
+            break;
+        case QEvent::KeyRelease:
+            if(static_cast<QKeyEvent*>(event)->key() == Qt::Key_Alt) {
+                setEnabled(false);
+            }
+            break;
+        default:
+            break;
+        }
+
+        return false;
+    }
+
+    int textFlags() const
+    {
+        return m_enabled ? Qt::TextShowMnemonic : Qt::TextHideMnemonic;
+    }
+
+private:
+    void setEnabled(bool enabled)
+    {
+        if (m_enabled == enabled)
+            return;
+
+        m_enabled = enabled;
+
+        foreach (QWidget *window, qApp->topLevelWidgets())
+            window->update();
+    }
+
+    bool m_enabled;
+};
+
 Style::Style()
-    : QProxyStyle(QStyleFactory::create("plastique"))
+    : QProxyStyle(QStyleFactory::create("plastique")),
+      m_mnemonics(new MnemonicsEventFilter(this))
 {
     setObjectName("eyeOS");
 
@@ -98,6 +149,7 @@ void Style::polish(QApplication *app)
     QFont font("Source Sans Pro");
     font.setPixelSize(16);
     app->setFont(font);
+    app->installEventFilter(m_mnemonics);
 }
 
 void Style::polish(QWidget *widget)
@@ -535,6 +587,13 @@ QRect Style::subElementRect(QStyle::SubElement element, const QStyleOption *opt,
     }
 
     return result;
+}
+
+void Style::drawItemText(QPainter *p, const QRect &rect, int flags, const QPalette &palette, bool enabled, const QString &text, QPalette::ColorRole role) const
+{
+    flags &= ~(Qt::TextShowMnemonic | Qt::TextHideMnemonic);
+    flags |= m_mnemonics->textFlags();
+    QProxyStyle::drawItemText(p, rect, flags, palette, enabled, text, role);
 }
 
 int Style::tabSpacing() const

@@ -36,6 +36,8 @@ class QStyleOptionMenuItem;
 class QStyleOptionSlider;
 class QStyleOptionSpinBox;
 
+class MnemonicsEventFilter;
+
 namespace EyeOs {
 
 class Style : public QProxyStyle
@@ -56,6 +58,8 @@ public:
     QSize sizeFromContents(ContentsType type, const QStyleOption *opt, const QSize &contentsSize, const QWidget *w) const;
     QRect subControlRect(ComplexControl control, const QStyleOptionComplex *opt, SubControl subControl, const QWidget *w) const;
     QRect subElementRect(SubElement element, const QStyleOption *opt, const QWidget *w) const;
+    void drawItemText(QPainter *p, const QRect &rect, int flags, const QPalette &palette, bool enabled,
+                      const QString &text, QPalette::ColorRole role = QPalette::NoRole) const;
 
 private:
     int tabSpacing() const;
@@ -79,6 +83,8 @@ private:
     void drawHeaderSection(const QStyleOption *opt, QPainter *p) const;
     void drawSlider(const QStyleOptionSlider *opt, QPainter *p, const QWidget *w) const;
     void drawSplitterHandle(const QStyleOption *opt, QPainter *p, Qt::Orientation orientation) const;
+
+    MnemonicsEventFilter *m_mnemonics;
 };
 
 }
