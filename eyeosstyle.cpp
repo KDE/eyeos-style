@@ -573,7 +573,7 @@ QRect Style::subElementRect(QStyle::SubElement element, const QStyleOption *opt,
     case SE_ItemViewItemText: {
         const QStyleOptionViewItemV4 *option = qstyleoption_cast<const QStyleOptionViewItemV4*>(opt);
         if (option && option->index.parent().isValid())
-            result.adjust(15, 0, 0, 0);
+            result.adjust(10, 0, 0, 0);
         else
             result.adjust(-5, 0, 0, 0);
         break;
