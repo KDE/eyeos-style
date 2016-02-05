@@ -681,12 +681,6 @@ void Style::drawLineEditBackground(const QStyleOption *opt, QPainter *p, const Q
                                    outlineWidth / 2,
                                    -outlineWidth / 2 - 1,
                                    -outlineWidth / 2 - 1));
-
-    if (!hasFrame) {
-        p->setPen(QPen(opt->palette.color(QPalette::Mid), outlineWidth));
-        p->drawLine(opt->rect.bottomLeft() - QPoint(0, outlineWidth / 2 + 1),
-                    opt->rect.bottomRight() - QPoint(0, outlineWidth / 2 + 1));
-    }
 }
 
 void Style::drawCheckBox(const QStyleOption *opt, QPainter *p) const
