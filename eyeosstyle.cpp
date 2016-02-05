@@ -401,6 +401,9 @@ int EyeOs::Style::pixelMetric(QStyle::PixelMetric metric, const QStyleOption *op
     case PM_IndicatorHeight:
         return 19;
 
+    case PM_ToolBarItemSpacing:
+        return 15;
+
     case PM_DefaultFrameWidth:
         return frameWidth();
     case PM_TabBarBaseOverlap:
