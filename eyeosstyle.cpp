@@ -711,6 +711,7 @@ void Style::drawToolButtonBackground(const QStyleOption *opt, QPainter *p, const
                       || (button && qobject_cast<KActionMenu*>(button->defaultAction()));
 
     const QColor bgColor = mouseOver ? opt->palette.color(QPalette::Inactive, QPalette::Highlight)
+                         : checked ? opt->palette.color(QPalette::Light)
                          : opt->palette.color(QPalette::Window);
 
     p->fillRect(opt->rect, bgColor);
