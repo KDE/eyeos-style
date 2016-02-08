@@ -456,6 +456,7 @@ int EyeOs::Style::pixelMetric(QStyle::PixelMetric metric, const QStyleOption *op
 {
     switch (metric) {
     case PM_ButtonIconSize:
+        return 20;
     case PM_ToolBarIconSize:
     case PM_IconViewIconSize:
         return 22;
