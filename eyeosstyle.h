@@ -35,6 +35,7 @@ class QStyleOptionComboBox;
 class QStyleOptionMenuItem;
 class QStyleOptionSlider;
 class QStyleOptionSpinBox;
+class QStyleOptionToolBar;
 
 class MnemonicsEventFilter;
 
@@ -83,6 +84,7 @@ private:
     void drawHeaderSection(const QStyleOption *opt, QPainter *p) const;
     void drawSlider(const QStyleOptionSlider *opt, QPainter *p, const QWidget *w) const;
     void drawSplitterHandle(const QStyleOption *opt, QPainter *p, Qt::Orientation orientation) const;
+    void drawToolBar(const QStyleOptionToolBar *opt, QPainter *p) const;
 
     MnemonicsEventFilter *m_mnemonics;
 };

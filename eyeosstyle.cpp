@@ -309,6 +309,17 @@ void EyeOs::Style::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption
         drawArrow(opt->rect, p, Qt::RightArrow);
         break;
 
+    case PE_IndicatorToolBarSeparator: {
+        SAVE_PAINTER(p);
+        p->setPen(opt->palette.color(QPalette::Light));
+        if (opt->state & State_Horizontal) {
+            p->drawLine(opt->rect.left(), opt->rect.top(), opt->rect.left(), opt->rect.bottom());
+        } else {
+            p->drawLine(opt->rect.left(), opt->rect.top(), opt->rect.right(), opt->rect.top());
+        }
+        break;
+    }
+
     case PE_PanelLineEdit:
         drawLineEditBackground(opt, p, w);
         break;
@@ -362,6 +373,10 @@ void EyeOs::Style::drawControl(QStyle::ControlElement control, const QStyleOptio
                         opt->rect.bottomRight() - QPoint(1, 0));
         }
         QCommonStyle::drawControl(control, opt, p, w);
+        break;
+
+    case CE_ToolBar:
+        drawToolBar(qstyleoption_cast<const QStyleOptionToolBar*>(opt), p);
         break;
 
     case CE_TabBarTabShape:
@@ -1095,4 +1110,30 @@ void Style::drawSplitterHandle(const QStyleOption *opt, QPainter *p, Qt::Orienta
                                                        : QPoint(opt->rect.center().x(), opt->rect.bottom());
     p->setPen(color);
     p->drawLine(start, end);
+}
+
+void Style::drawToolBar(const QStyleOptionToolBar *opt, QPainter *p) const
+{
+    if (opt->toolBarArea == Qt::NoToolBarArea)
+        return;
+
+    SAVE_PAINTER(p);
+    p->setPen(opt->palette.color(QPalette::Light));
+
+    switch (opt->toolBarArea) {
+    case Qt::TopToolBarArea:
+        p->drawLine(opt->rect.bottomLeft(), opt->rect.bottomRight());
+        break;
+    case Qt::BottomToolBarArea:
+        p->drawLine(opt->rect.topLeft(), opt->rect.topRight());
+        break;
+    case Qt::LeftToolBarArea:
+        p->drawLine(opt->rect.topRight(), opt->rect.bottomRight());
+        break;
+    case Qt::RightToolBarArea:
+        p->drawLine(opt->rect.topLeft(), opt->rect.bottomLeft());
+        break;
+    default:
+        break;
+    }
 }
