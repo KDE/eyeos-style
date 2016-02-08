@@ -348,6 +348,15 @@ void EyeOs::Style::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption
         }
         break;
 
+    case PE_IndicatorHeaderArrow: {
+        const QStyleOptionHeader *option = qstyleoption_cast<const QStyleOptionHeader *>(opt);
+        if (option->sortIndicator & QStyleOptionHeader::SortUp)
+            drawArrow(opt->rect, p, Qt::DownArrow);
+        else
+            drawArrow(opt->rect, p, Qt::UpArrow);
+        break;
+    }
+
     default:
         QProxyStyle::drawPrimitive(pe, opt, p, w);
         break;
