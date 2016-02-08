@@ -168,6 +168,11 @@ void Style::polish(QWidget *widget)
             palette.setColor(QPalette::Highlight, palette.color(QPalette::AlternateBase));
             palette.setColor(QPalette::HighlightedText, palette.color(QPalette::WindowText));
             widget->setPalette(palette);
+        } else if (widget->inherits("QComboBoxListView")) {
+            QPalette palette = widget->palette();
+            palette.setColor(QPalette::Highlight, QColor("#EDEDF2"));
+            palette.setColor(QPalette::HighlightedText, palette.color(QPalette::WindowText));
+            widget->setPalette(palette);
         } else {
             QPalette palette = widget->palette();
             palette.setColor(QPalette::Highlight, palette.color(QPalette::Light));
@@ -945,7 +950,7 @@ void Style::drawMenuItem(const QStyleOptionMenuItem *opt, QPainter *p, const QWi
     const bool enabled = opt->state & State_Enabled;
     const bool active = opt->state & State_Selected;
 
-    const QColor bgColor = (active && enabled) ? opt->palette.color(QPalette::Inactive, QPalette::Highlight)
+    const QColor bgColor = (active && enabled) ? QColor("#EDEDF2")
                                                : opt->palette.color(QPalette::Window);
     p->fillRect(opt->rect, bgColor);
 
