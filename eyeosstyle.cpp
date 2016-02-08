@@ -33,6 +33,7 @@
 #include <QDateTimeEdit>
 #include <QDoubleSpinBox>
 #include <QKeyEvent>
+#include <QMainWindow>
 #include <QMenuBar>
 #include <QPainter>
 #include <QPushButton>
@@ -42,6 +43,7 @@
 #include <QStyleFactory>
 #include <QStyleOption>
 #include <QTimeEdit>
+#include <QToolBar>
 #include <QToolButton>
 #include <QSplitter>
 
@@ -710,6 +712,10 @@ void Style::drawToolButtonBackground(const QStyleOption *opt, QPainter *p, const
                       || (button && button->menu())
                       || (button && qobject_cast<KActionMenu*>(button->defaultAction()));
 
+    QToolBar *toolBar = button ? qobject_cast<QToolBar*>(button->parentWidget()): 0;
+    const QMainWindow *window = toolBar ? qobject_cast<QMainWindow*>(toolBar->parentWidget()): 0;
+    const bool isBottom = window && window->toolBarArea(toolBar) == Qt::BottomToolBarArea;
+
     const QColor bgColor = mouseOver ? opt->palette.color(QPalette::Inactive, QPalette::Highlight)
                          : checked ? opt->palette.color(QPalette::Light)
                          : opt->palette.color(QPalette::Window);
@@ -723,8 +729,14 @@ void Style::drawToolButtonBackground(const QStyleOption *opt, QPainter *p, const
         const QColor penColor = opt->palette.color(QPalette::Active, QPalette::Highlight);
 
         p->setPen(QPen(penColor, penWidth));
-        p->drawLine(opt->rect.topLeft() + QPoint(0, penWidth / 2),
-                    opt->rect.topRight() + QPoint(0, penWidth / 2));
+
+        if (!isBottom) {
+            p->drawLine(opt->rect.topLeft() + QPoint(0, penWidth / 2),
+                        opt->rect.topRight() + QPoint(0, penWidth / 2));
+        } else {
+            p->drawLine(opt->rect.bottomLeft() - QPoint(0, penWidth / 2),
+                        opt->rect.bottomRight() - QPoint(0, penWidth / 2));
+        }
     }
 }
 
